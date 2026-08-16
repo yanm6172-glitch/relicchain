@@ -1,5 +1,6 @@
 ﻿# 29 GitHub 上传指南
 
+> 已上线仓库：https://github.com/yanm6172-glitch/relicchain （原名 mach，已改名并写好项目介绍与标签）
 > 本地仓库已就绪（55 文件已提交）。推送只需两步。
 
 ## 第一步 · 在 GitHub 创建空仓库（3 分钟）
@@ -42,3 +43,4 @@ git push -u origin main
 | 报 rejected（远端有内容） | 创建仓库时勾了 README——删掉远端仓库重建，或 `git pull --rebase` 后重推 |
 | 想更新代码后再推 | `git add -A` → `git commit -m "更新说明"` → `git push` |
 | data.json 想公开样例 | 删除 .gitignore 中 data.json 那行即可（注意含账号哈希） |
+
