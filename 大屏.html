@@ -1,0 +1,513 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文博链 · 文物数字资产监测大屏</title>
+<style>
+:root{--bg0:#03141f;--bg1:#06283a;--panel:rgba(8,42,60,.55);--bd:#0e4a66;--gold:#d4a943;--gold2:#f3d27a;--cyan:#38bdf8;--green:#34d399;--red:#f87171;--txt:#cfe3ea;--dim:#6b8ea0;--mono:Consolas,Menlo,monospace;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;background:radial-gradient(1200px 700px at 50% -10%,#0a3a52 0%,var(--bg0) 55%);color:var(--txt);min-height:100vh;overflow-x:hidden}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(56,189,248,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(56,189,248,.05) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+
+/* 顶部 */
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 26px;border-bottom:1px solid var(--bd);background:linear-gradient(180deg,rgba(8,42,60,.9),transparent)}
+.top .title{font-size:22px;font-weight:800;letter-spacing:4px;color:#fff}
+.top .title .sub{font-size:11px;letter-spacing:2px;color:var(--gold);margin-top:2px;font-weight:600}
+.top .meta{display:flex;gap:18px;align-items:center;font-size:13px;color:var(--dim)}
+.top .meta .clock{font-family:var(--mono);font-size:18px;color:var(--gold2);font-weight:700}
+.pill{background:rgba(56,189,248,.12);border:1px solid var(--bd);border-radius:20px;padding:4px 13px;font-size:12px}
+.pill.green{border-color:#14532d;background:rgba(52,211,153,.1);color:var(--green)}
+
+/* 布局 */
+.grid{display:grid;grid-template-columns:300px 1fr 300px;gap:14px;padding:14px 18px 60px;max-width:1900px;margin:0 auto}
+.col{display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;position:relative;backdrop-filter:blur(4px)}
+.panel::before{content:"";position:absolute;top:-1px;left:16px;right:16px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.panel h3{font-size:14px;letter-spacing:2px;color:var(--gold2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.panel h3::before{content:"◆";font-size:9px;color:var(--gold)}
+
+/* 核心指标 */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.kpi{background:rgba(56,189,248,.06);border:1px solid var(--bd);border-radius:12px;padding:12px;text-align:center}
+.kpi .v{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--gold2)}
+.kpi .k{font-size:11px;color:var(--dim);margin-top:3px;letter-spacing:1px}
+
+/* 柱状图 */
+.bars{display:flex;align-items:flex-end;gap:8px;height:130px;padding:0 4px}
+.bar{flex:1;background:linear-gradient(180deg,var(--gold),#7a5c10);border-radius:5px 5px 2px 2px;position:relative;min-height:6px;animation:grow 1s ease}
+.bar .bv{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--gold2);font-family:var(--mono)}
+.bar-labels{display:flex;gap:8px;margin-top:6px}
+.bar-labels span{flex:1;text-align:center;font-size:10px;color:var(--dim)}
+
+/* 环形图 */
+.donut-row{display:flex;align-items:center;gap:16px}
+.donut{width:110px;height:110px;border-radius:50%;position:relative;flex:none}
+.donut .hole{position:absolute;inset:22px;background:var(--bg1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold2);font-family:var(--mono)}
+.legend{font-size:11.5px;color:var(--dim);line-height:2}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+
+/* 中央链 */
+.chain-panel{padding:16px}
+.chain-line{display:flex;align-items:center;gap:6px;overflow-x:auto;padding:10px 2px}
+.chip{flex:none;background:rgba(56,189,248,.07);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;min-width:150px;transition:all .2s}
+.chip:hover{border-color:var(--gold);transform:translateY(-2px)}
+.chip .no{font-family:var(--mono);font-size:12px;color:var(--gold2);font-weight:700}
+.chip .ty{font-size:10px;color:var(--cyan);margin:2px 0}
+.chip .ct{font-size:11px;color:var(--txt)}
+.chip .hs{font-family:var(--mono);font-size:9.5px;color:var(--dim);margin-top:4px;word-break:break-all}
+.link{flex:none;color:var(--gold);font-size:16px;animation:linkpulse 2s ease infinite}
+.center-bottom{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+
+/* 节点 */
+.nodes{display:flex;gap:10px}
+.node{flex:1;background:rgba(52,211,153,.06);border:1px solid #14532d;border-radius:12px;padding:10px;text-align:center}
+.node .dot{width:9px;height:9px;border-radius:50%;background:var(--green);margin:0 auto 6px;animation:blink 1.6s ease infinite}
+.node .nm{font-size:11px;color:var(--txt)}
+.node .st{font-size:10px;color:var(--green)}
+.node.bad{border-color:#7f1d1d;background:rgba(248,113,113,.08)}
+.node.bad .dot{background:var(--red);animation:none}
+.node.bad .st{color:var(--red)}
+
+/* 滚动日志 */
+.log{max-height:210px;overflow-y:auto;font-family:var(--mono);font-size:11px;line-height:1.9;color:var(--dim)}
+.log div{border-bottom:1px dashed rgba(14,74,102,.5);padding:3px 0}
+.log .tm{color:#4b7d94}
+.log .ac{color:var(--cyan)}
+.log .bad{color:var(--red)}
+
+/* 底部 */
+.foot{position:fixed;bottom:0;left:0;right:0;background:rgba(3,20,31,.92);border-top:1px solid var(--bd);padding:7px 26px;font-size:11px;color:var(--dim);display:flex;justify-content:space-between;z-index:10}
+
+@keyframes grow{from{height:0}}
+@keyframes blink{50%{opacity:.35}}
+@keyframes linkpulse{50%{opacity:.45}}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}.top{flex-direction:column;gap:8px;align-items:flex-start}}
+.panel.focus{border-color:var(--gold);box-shadow:0 0 26px rgba(212,169,67,.28),inset 0 0 34px rgba(212,169,67,.07);transition:all .6s}
+.panel.focus::before{height:3px}
+.kpi.flash .v{animation:countflash 1s ease}
+@keyframes countflash{0%{opacity:.15;transform:scale(1.18)}100%{opacity:1;transform:scale(1)}}
+.demo-on .chip{animation:chipglow 3s ease infinite}
+@keyframes chipglow{50%{border-color:var(--gold)}}
+.qrwrap{display:flex;gap:14px;align-items:center}
+.qrbox{width:98px;height:98px;background:#fff;border-radius:8px;padding:6px;flex:none;box-shadow:0 0 16px rgba(212,169,67,.25)}
+.qrinfo{font-size:12px;color:var(--dim);line-height:2}
+.qrinfo .qt{color:var(--gold2);font-weight:700;font-size:13px}
+.ticker{overflow:hidden;white-space:nowrap;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed var(--bd)}
+.ticker-inner{display:inline-block;font-family:var(--mono);font-size:11.5px;color:var(--gold2);animation:tick 45s linear infinite}
+.ticker-inner .seg{margin-right:26px}
+.ticker-inner .seg .dim{color:var(--dim)}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.foot-row{display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<div class="top">
+  <div class="title">文博链 · 文物数字资产监测大屏<span class="sub">RELICCHAIN · CULTURAL RELIC DIGITAL ASSET MONITOR</span><span class="pill" id="sceneName" style="margin-left:14px;color:var(--gold2);border-color:#8a6d1f">综合总览 · 链全景</span></div>
+  <div class="meta">
+    <span class="pill green">● 联盟链运行中</span>
+    <span class="pill">节点 <span id="nodeOnline">4</span>/4 在线</span>
+    <span class="pill">难度 <span id="diffShow">2</span></span>
+    <button class="pill" id="demoBtn" style="cursor:pointer;background:rgba(212,169,67,.15);border-color:#8a6d1f;color:var(--gold2);font-weight:700" onclick="toggleDemo()">▶ 演示模式</button><span class="clock" id="clock">--:--:--</span>
+  </div>
+</div>
+
+<div class="grid">
+  <!-- 左列 -->
+  <div class="col">
+    <div class="panel">
+      <h3>核心指标</h3>
+      <div class="kpis">
+        <div class="kpi"><div class="v" id="kHeight">0</div><div class="k">区块高度</div></div>
+        <div class="kpi"><div class="v" id="kRelic">0</div><div class="k">登记文物</div></div>
+        <div class="kpi"><div class="v" id="kEvent">0</div><div class="k">溯源事件</div></div>
+        <div class="kpi"><div class="v" id="kLic">0</div><div class="k">授权记录</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>近 7 日上链事件</h3>
+      <div class="bars" id="bars"></div>
+      <div class="bar-labels" id="barLabels"></div>
+    </div>
+    <div class="panel">
+      <h3>文物年代分布</h3>
+      <div class="donut-row">
+        <div class="donut" id="donut1"><div class="hole">年代</div></div>
+        <div class="legend" id="legend1"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 中列 -->
+  <div class="col">
+    <div class="panel chain-panel">
+      <h3>区块链全景 · 最新区块</h3>
+      <div class="chain-line" id="chainLine"></div>
+      <div class="center-bottom">
+        <div class="panel" style="background:rgba(8,42,60,.3)">
+          <h3>联盟共识节点</h3>
+          <div class="nodes" id="nodesBox"></div>
+        </div>
+        <div class="panel" style="background:rgba(8,42,60,.3)">
+          <h3>事件类型分布</h3>
+          <div class="donut-row">
+            <div class="donut" id="donut2"><div class="hole">类型</div></div>
+            <div class="legend" id="legend2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 右列 -->
+  <div class="col">
+    <div class="panel">
+      <h3>存证凭证 · 扫码复验</h3>
+      <div class="qrwrap">
+        <div class="qrbox" id="qrBox"></div>
+        <div class="qrinfo">
+          <div class="qt">摩崖造像 · 主尊龛</div>
+          <div>凭证号 RC-1-9F3A6B1C</div>
+          <div>区块 #1 · 4/4 节点确认</div>
+          <div>扫码查看链上凭证<br>（演示占位，可替换真实二维码）</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>平台运行</h3>
+      <div class="kpis">
+        <div class="kpi"><div class="v" id="kNonce">0</div><div class="k">平均 nonce</div></div>
+        <div class="kpi"><div class="v" id="kAudit">0</div><div class="k">审计日志</div></div>
+        <div class="kpi"><div class="v" id="kOrg">0</div><div class="k">准入机构</div></div>
+        <div class="kpi"><div class="v" id="kHash">—</div><div class="k">末块哈希</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>实时审计流</h3>
+      <div class="log" id="logBox"></div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <div class="ticker"><div class="ticker-inner" id="tickerInner"></div></div>
+  <div class="foot-row">
+    <span id="dataSrc">数据来源：本机平台数据（区块链平台.html）或演示示例数据 · 断网可用</span>
+    <span>双击全屏 · ▶ 演示模式自动轮播 · 设计借鉴：历史文化街区数字化项目</span>
+  </div>
+</div>
+<script>
+/* ============ 数据源：优先读本机平台数据 ============ */
+var DATA = null;
+try{
+  var raw = localStorage.getItem('rc_platform_v2');
+  if (raw){ var d = JSON.parse(raw); if (d && d.chain && d.chain.length) DATA = d; }
+}catch(e){}
+
+var SAMPLE = {
+  chain: [
+    {index:0, data:{type:'GENESIS', content:'创世区块'}, hash:'a0f3c21e9b…77aa', time:Date.now()-3600000},
+    {index:1, data:{type:'REGISTER', name:'摩崖造像 · 主尊龛', content:'碧水寺-001 三维扫描建档'}, hash:'9f3a6b1c…c21e', time:Date.now()-3000000},
+    {index:2, data:{type:'REGISTER', name:'摩崖造像 · 说法图', content:'碧水寺-002 三维扫描建档'}, hash:'7c2d5e8f…ab09', time:Date.now()-2700000},
+    {index:3, data:{type:'REGISTER', name:'胁侍菩萨龛', content:'碧水寺-003 三维扫描建档'}, hash:'31e8f04a…77d4', time:Date.now()-2400000},
+    {index:4, data:{type:'REGISTER', name:'碑刻 · 题记', content:'碧水寺-004 高精度数字化'}, hash:'85b1c9d3…04aa', time:Date.now()-2100000},
+    {index:5, data:{type:'EVENT', name:'摩崖造像 · 主尊龛', content:'2026-03 石质病害检测，无新增开裂'}, hash:'46f2a8c0…b355', time:Date.now()-1800000},
+    {index:6, data:{type:'EVENT', name:'摩崖造像 · 说法图', content:'2026-04 表层粉化加固完成'}, hash:'c8d4e210…91f7', time:Date.now()-1500000},
+    {index:7, data:{type:'LICENSE', name:'摩崖造像 · 主尊龛', content:'授权上海XX文创：数字展览与文创设计'}, hash:'0b7e3a55…d8c2', time:Date.now()-1200000}
+  ],
+  artifacts: 4, events: 2, licenses: 1, audit: 12, orgs: 4, diff: 2, nonce: 186
+};
+function real(){ return DATA || null; }
+
+/* ============ 通用 ============ */
+function short(h){ if(!h) return ''; return h.slice(0,8) + '…' + h.slice(-4); }
+function fmt(t){ var d = new Date(t); return d.toLocaleTimeString('zh-CN', {hour12:false}); }
+function $id(x){ return document.getElementById(x); }
+
+/* ============ 指标 ============ */
+function countBy(type){
+  var chain = real() ? real().chain : SAMPLE.chain;
+  var n = 0; chain.forEach(function(b){ if (b.data.type === type) n++; }); return n;
+}
+function renderKpis(){
+  var chain = real() ? real().chain : SAMPLE.chain;
+  var a = real() ? real().artifacts.length : SAMPLE.artifacts;
+  $id('kHeight').textContent = chain.length - 1;
+  $id('kRelic').textContent = a;
+  $id('kEvent').textContent = countBy('EVENT');
+  $id('kLic').textContent = countBy('LICENSE');
+  $id('kOrg').textContent = real() ? (real().orgs ? real().orgs.length : 4) : SAMPLE.orgs;
+  $id('kAudit').textContent = real() ? (real().audit ? real().audit.length : 0) : SAMPLE.audit;
+  $id('kNonce').textContent = real() ? avgNonce() : SAMPLE.nonce;
+  $id('diffShow').textContent = real() ? (real().diff || 2) : SAMPLE.diff;
+  var last = chain[chain.length-1];
+  $id('kHash').textContent = short(last.hash).slice(0,10);
+}
+function avgNonce(){
+  var chain = real().chain; var s = 0, n = 0;
+  chain.forEach(function(b){ if (b.nonce){ s += b.nonce; n++; } });
+  return n ? Math.round(s / n) : 0;
+}
+
+/* ============ 链全景 ============ */
+var TYPE_LABEL = { GENESIS:'创世', REGISTER:'登记', EVENT:'溯源', LICENSE:'授权' };
+function renderChain(){
+  var chain = real() ? real().chain : SAMPLE.chain;
+  var last = chain.slice(-8);
+  var html = '';
+  last.forEach(function(b, i){
+    if (i > 0) html += '<span class="link">⛓</span>';
+    html += '<div class="chip"><div class="no">区块 #' + b.index + '</div>' +
+      '<div class="ty">' + (TYPE_LABEL[b.data.type] || '数据') + ' · ' + fmt(b.time) + '</div>' +
+      '<div class="ct">' + (b.data.name || b.data.content || '').slice(0, 16) + '</div>' +
+      '<div class="hs">' + short(b.hash) + '</div></div>';
+  });
+  $id('chainLine').innerHTML = html;
+}
+function buildTicker(){
+  var chain = real() ? real().chain : SAMPLE.chain;
+  var parts = [];
+  chain.slice(-10).forEach(function(b){
+    var label = TYPE_LABEL[b.data.type] || '数据';
+    parts.push('<span class="seg">区块 #' + b.index + ' · ' + label + ' · ' + (b.data.name || b.data.content || '').slice(0, 14) + ' <span class="dim">' + short(b.hash) + '</span> ⛓</span>');
+  });
+  var inner = document.getElementById('tickerInner');
+  if (inner) inner.innerHTML = parts.join('') + parts.join('');
+}
+function renderNodes(){
+  var names = ['主管部门','绵阳市博物馆','公证机构','平台运营方'];
+  var html = '';
+  names.forEach(function(n, i){
+    var bad = (tickCount % 40 === 33 && i === 2);
+    html += '<div class="node' + (bad ? ' bad' : '') + '"><div class="dot"></div><div class="nm">' + n + '</div><div class="st">' + (bad ? '告警' : '同步正常') + '</div></div>';
+  });
+  $id('nodesBox').innerHTML = html;
+  $id('nodeOnline').textContent = 4;
+}
+
+/* ============ 柱状图（近 7 日） ============ */
+function renderBars(){
+  var base = [12, 18, 9, 21, 15, 26, 19];
+  var chain = real() ? real().chain : SAMPLE.chain;
+  var days = ['周一','周二','周三','周四','周五','周六','周日'];
+  if (chain.length > 7){ base = [8,14,11,19,16,24,chain.length % 10 + 5]; }
+  var html = ''; var labels = '';
+  for (var i = 0; i < 7; i++){
+    var h = Math.max(8, base[i] * 3.6);
+    html += '<div class="bar" style="height:' + h + 'px"><span class="bv">' + base[i] + '</span></div>';
+    labels += '<span>' + days[i] + '</span>';
+  }
+  $id('bars').innerHTML = html;
+  $id('barLabels').innerHTML = labels;
+}
+
+/* ============ 环形图 ============ */
+function renderDonuts(){
+  var c1 = [45, 30, 15, 10];
+  var l1 = [['隋', '#d4a943'], ['唐', '#38bdf8'], ['宋', '#34d399'], ['其他', '#64748b']];
+  var seg = '', acc = 0;
+  for (var i = 0; i < c1.length; i++){
+    seg += (l1[i][1] + ' ' + acc + '% ' + (acc + c1[i]) + '%,');
+    acc += c1[i];
+  }
+  seg = seg.slice(0, -1);
+  $id('donut1').style.background = 'conic-gradient(' + seg + ')';
+  var lg = '';
+  l1.forEach(function(x){ lg += '<div><i style="background:' + x[1] + '"></i>' + x[0] + ' · ' + c1[l1.indexOf(x)] + '%</div>'; });
+  $id('legend1').innerHTML = lg;
+
+  var ev = countBy('EVENT'); var reg = countBy('REGISTER'); var lic = countBy('LICENSE');
+  var tot = Math.max(1, ev + reg + lic);
+  var p1 = Math.round(reg / tot * 100), p2 = Math.round(ev / tot * 100), p3 = Math.round(lic / tot * 100);
+  $id('donut2').style.background = 'conic-gradient(#d4a943 0% ' + p1 + '%,#38bdf8 ' + p1 + '% ' + (p1+p2) + '%,#34d399 ' + (p1+p2) + '% 100%)';
+  $id('legend2').innerHTML = '<div><i style="background:#d4a943"></i>登记 ' + p1 + '%</div>' +
+    '<div><i style="background:#38bdf8"></i>溯源 ' + p2 + '%</div>' +
+    '<div><i style="background:#34d399"></i>授权 ' + p3 + '%</div>';
+}
+
+/* ============ 实时审计流（演示模拟） ============ */
+var tickCount = 0;
+var LOGS = [];
+function pushLog(actor, action, bad){
+  var now = new Date();
+  LOGS.unshift({ t: now.toLocaleTimeString('zh-CN',{hour12:false}), a: actor, c: action, bad: !!bad });
+  if (LOGS.length > 24) LOGS.pop();
+  var html = '';
+  LOGS.forEach(function(l){
+    html += '<div><span class="tm">[' + l.t + ']</span> <span class="ac">' + l.a + '</span> ' + (l.bad ? '<span class="bad">' + l.c + '</span>' : l.c) + '</div>';
+  });
+  $id('logBox').innerHTML = html;
+}
+var ACTIONS = [
+  ['绵阳市博物馆','登记文物：摩崖造像 · 主尊龛 → 区块 #1'],
+  ['文物检测中心','溯源事件：石质病害检测 → 区块 #5'],
+  ['绵阳市博物馆','数字授权：上海XX文创 · 数字展览 → 区块 #7'],
+  ['平台管理员','审计查询：导出审计日志'],
+  ['游客','文件验证：碧水寺-001 判定为官方原版'],
+  ['公证机构','节点校验：整条链校验通过']
+];
+function seedLogs(){
+  if (DATA && DATA.audit && DATA.audit.length){
+    DATA.audit.slice(-16).reverse().forEach(function(a){
+      pushLog(a.actor || '系统', a.action + ' · ' + a.detail, false);
+    });
+    return;
+  }
+  for (var i = 0; i < 8; i++){
+    var k = i % ACTIONS.length;
+    pushLog(ACTIONS[k][0], ACTIONS[k][1], false);
+  }
+  pushLog('安全模块', '⚠ 拦截疑似篡改：区块 #2 指纹不符（演示）', true);
+}
+
+/* ============ 演示模式（展会投屏自动轮播） ============ */
+var DEMO = false;
+var demoTimer = null;
+var logScrollTimer = null;
+var SCENES = [
+  { name:'综合总览 · 链全景', sel:'#chainLine', kpi:true },
+  { name:'溯源分析 · 近 7 日事件', sel:'#bars', kpi:false },
+  { name:'文物档案 · 年代分布', sel:'#donut1', kpi:false },
+  { name:'平台运行 · 实时审计', sel:'#logBox', kpi:false }
+];
+var sceneIdx = 0;
+function clearFocus(){
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('focus'); });
+}
+function flashKpis(){
+  document.querySelectorAll('.kpi').forEach(function(k){
+    k.classList.remove('flash');
+    void k.offsetWidth;
+    k.classList.add('flash');
+  });
+}
+function runScene(i){
+  sceneIdx = i % SCENES.length;
+  var sc = SCENES[sceneIdx];
+  clearFocus();
+  var target = document.querySelector(sc.sel);
+  if (target){
+    var panel = target.closest('.panel');
+    if (panel) panel.classList.add('focus');
+  }
+  document.getElementById('sceneName').textContent = sc.name;
+  if (sc.kpi) flashKpis();
+  clearInterval(demoTimer);
+  demoTimer = setInterval(function(){ runScene(sceneIdx + 1); }, 20000);
+}
+function toggleDemo(){
+  DEMO = !DEMO;
+  var btn = document.getElementById('demoBtn');
+  if (DEMO){
+    btn.textContent = '⏸ 退出演示';
+    document.body.classList.add('demo-on');
+    runScene(0);
+    logScrollTimer = setInterval(function(){
+      var lb = document.getElementById('logBox');
+      lb.scrollTop = lb.scrollHeight;
+    }, 2000);
+  } else {
+    btn.textContent = '▶ 演示模式';
+    document.body.classList.remove('demo-on');
+    clearInterval(demoTimer);
+    clearInterval(logScrollTimer);
+    clearFocus();
+    document.getElementById('sceneName').textContent = '综合总览 · 链全景';
+  }
+}
+/* 双击全屏 */
+document.addEventListener('dblclick', function(){
+  if (!document.fullscreenElement){
+    if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) document.exitFullscreen();
+  }
+});
+/* 数字滚动动画 */
+function countUp(id, target){
+  var el = document.getElementById(id);
+  if (!el || target === null || isNaN(target)) return;
+  var t0 = performance.now();
+  var dur = 900;
+  function step(now){
+    var p = Math.min(1, (now - t0) / dur);
+    el.textContent = Math.round(target * p);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ============ 凭证二维码（演示占位） ============ */
+function drawQr(){
+  var n = 21, size = 84, cell = size / n;
+  var svg = '<svg viewBox="0 0 ' + size + ' ' + size + '" width="84" height="84" xmlns="http://www.w3.org/2000/svg"><rect width="' + size + '" height="' + size + '" fill="#ffffff"/>';
+  function inFinder(r, c){
+    return (r < 8 && c < 8) || (r < 8 && c >= n - 8) || (r >= n - 8 && c < 8);
+  }
+  function finder(r0, c0){
+    svg += '<rect x="' + (c0 * cell) + '" y="' + (r0 * cell) + '" width="' + (7 * cell) + '" height="' + (7 * cell) + '" fill="#0b1f33"/>';
+    svg += '<rect x="' + ((c0 + 1) * cell) + '" y="' + ((r0 + 1) * cell) + '" width="' + (5 * cell) + '" height="' + (5 * cell) + '" fill="#ffffff"/>';
+    svg += '<rect x="' + ((c0 + 2) * cell) + '" y="' + ((r0 + 2) * cell) + '" width="' + (3 * cell) + '" height="' + (3 * cell) + '" fill="#0b1f33"/>';
+  }
+  finder(0, 0); finder(0, n - 7); finder(n - 7, 0);
+  for (var r = 0; r < n; r++){
+    for (var c = 0; c < n; c++){
+      if (inFinder(r, c)) continue;
+      var v = (r * 31 + c * 17 + 7) % 11;
+      if (v < 5) svg += '<rect x="' + (c * cell) + '" y="' + (r * cell) + '" width="' + (cell + 0.4) + '" height="' + (cell + 0.4) + '" fill="#0b1f33"/>';
+    }
+  }
+  svg += '</svg>';
+  document.getElementById('qrBox').innerHTML = svg;
+}
+
+/* ============ 时钟 & 心跳 ============ */
+function tickClock(){
+  var d = new Date();
+  var p = function(n){ return (n < 10 ? '0' : '') + n; };
+  $id('clock').textContent = d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+}
+
+function init(){
+  tickClock();
+  setInterval(tickClock, 1000);
+  renderKpis(); renderChain(); renderNodes(); renderBars(); renderDonuts(); seedLogs(); drawQr(); buildTicker();
+  countUp('kHeight', parseInt(document.getElementById('kHeight').textContent, 10));
+  countUp('kRelic', parseInt(document.getElementById('kRelic').textContent, 10));
+  countUp('kEvent', parseInt(document.getElementById('kEvent').textContent, 10));
+  countUp('kLic', parseInt(document.getElementById('kLic').textContent, 10));
+  countUp('kAudit', parseInt(document.getElementById('kAudit').textContent, 10));
+  countUp('kOrg', parseInt(document.getElementById('kOrg').textContent, 10));
+  countUp('kNonce', parseInt(document.getElementById('kNonce').textContent, 10));
+  setInterval(function(){
+    tickCount++;
+    renderNodes();
+    if (tickCount % 3 === 0){
+      var k = tickCount % ACTIONS.length;
+      pushLog(ACTIONS[k][0], ACTIONS[k][1], (tickCount % 15 === 12));
+    }
+  }, 3000);
+}
+function boot(){
+  if (location.protocol.indexOf('http') === 0){
+    fetch('/api/state').then(function(r){ return r.json(); }).then(function(st){
+      if (st && st.chain && st.chain.length){
+        DATA = st;
+        var ds = document.getElementById('dataSrc');
+        if (ds) ds.textContent = '数据来源：服务端实时数据（区块高度 ' + (st.chain.length - 1) + ' · ' + st.artifacts.length + ' 件文物）';
+      }
+      init();
+    }).catch(function(){ init(); });
+  } else { init(); }
+}
+boot();
+</script>
+</body>
+</html>
+
+
+
+
+

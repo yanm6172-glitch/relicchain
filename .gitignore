@@ -1,0 +1,10 @@
+﻿# 运行时数据（首次启动自动生成，含账号信息，不提交）
+data.json
+
+# 系统文件
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# 临时文件
+.platform-new.html

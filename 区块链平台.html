@@ -1,0 +1,1517 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1d4ed8">
+<title>文博链 · 区块链平台 v1.8</title>
+<style>
+:root{--p1:#1d4ed8;--p2:#3b82f6;--p3:#60a5fa;--green:#059669;--green2:#10b981;--gold:#d97706;--purple:#7c3aed;--red:#dc2626;--ink:#0f172a;--muted:#64748b;--bg:#eef2f7;--card:#ffffff;--line:#e2e8f0;--soft:#f1f5f9;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;background:linear-gradient(180deg,#e7edf8 0%,#f4f7fb 100%);color:var(--ink);line-height:1.6}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none !important}
+
+/* ---------- 登录页 ---------- */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;position:relative;overflow:hidden;background:linear-gradient(150deg,#0b1f4b 0%,#1d4ed8 55%,#4f46e5 100%)}
+.login-screen::before{content:"";position:absolute;width:440px;height:440px;border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,.38),transparent 70%);top:-130px;right:-110px}
+.login-screen::after{content:"";position:absolute;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(167,139,250,.32),transparent 70%);bottom:-130px;left:-90px}
+.login-card{position:relative;background:rgba(255,255,255,.97);border-radius:24px;padding:32px 26px 24px;width:100%;max-width:400px;text-align:center;box-shadow:0 24px 60px rgba(2,6,23,.45);animation:fadeUp .5s ease}
+.logo{width:74px;height:74px;margin:0 auto 12px;border-radius:22px;background:linear-gradient(135deg,#1d4ed8,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:0 10px 26px rgba(29,78,216,.4)}
+.login-card h1{font-size:23px;letter-spacing:1px;margin-bottom:4px}
+.login-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:20px}
+.role-card{display:block;width:100%;text-align:left;border:1.5px solid var(--line);border-radius:16px;padding:13px 16px;margin-bottom:10px;background:#fff;transition:all .18s ease;position:relative;overflow:hidden}
+.role-card:hover,.role-card:active{border-color:var(--p2);background:#eff6ff;transform:translateY(-2px);box-shadow:0 8px 20px rgba(29,78,216,.14)}
+.role-card::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;border-radius:4px;background:linear-gradient(180deg,var(--p1),var(--p3));opacity:0;transition:opacity .18s}
+.role-card:hover::before{opacity:1}
+.r-name{font-weight:800;font-size:15px}
+.r-org{font-size:12.5px;color:var(--p1);margin:2px 0}
+.r-desc{font-size:12px;color:var(--muted)}
+.foot-note{font-size:11.5px;color:var(--muted);margin-top:14px}
+.cred{text-align:left;margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
+.cred .field{margin-bottom:10px}
+.cred .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.cred .field input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;transition:all .15s}
+.cred .field input:focus{outline:none;border-color:var(--p2);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.err{color:#dc2626;font-size:12px;margin:0 0 8px;display:none}
+.acchint{font-size:11px;color:var(--muted);margin-top:12px;text-align:left;line-height:1.8}
+
+/* ---------- App 壳 ---------- */
+.app{max-width:560px;margin:0 auto;min-height:100vh;background:#f6f8fc;box-shadow:0 0 40px rgba(15,23,42,.18);padding-bottom:78px}
+.app-header{position:sticky;top:0;z-index:20;background:linear-gradient(120deg,#0b1f4b,#1d4ed8 60%,#3b82f6);color:#fff;padding:16px 18px 14px;display:flex;justify-content:space-between;align-items:center;border-radius:0 0 18px 18px;box-shadow:0 6px 18px rgba(29,78,216,.28)}
+.app-title{font-size:17px;font-weight:800;letter-spacing:.5px}
+.app-sub{font-size:11px;opacity:.85;margin-top:2px}
+.logout{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:10px;padding:6px 14px;font-size:12px;transition:all .15s}
+.logout:hover{background:rgba(255,255,255,.24)}
+.main{padding:14px 16px}
+.tab{display:none}
+.tab.active{display:block;animation:fadeUp .3s ease}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px 16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(15,23,42,.05)}
+.card h3{font-size:15px;margin-bottom:10px;display:flex;align-items:center}
+.card h3::before{content:"";width:4px;height:16px;border-radius:3px;background:linear-gradient(180deg,var(--p1),var(--p3));margin-right:8px}
+.card h3 .tag{font-size:11.5px;color:var(--muted);font-weight:400;margin-left:6px}
+
+/* ---------- 统计 ---------- */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 14px;position:relative;overflow:hidden;box-shadow:0 2px 10px rgba(15,23,42,.05)}
+.stat-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card:nth-child(1)::before{background:linear-gradient(90deg,#1d4ed8,#60a5fa)}
+.stat-card:nth-child(2)::before{background:linear-gradient(90deg,#059669,#34d399)}
+.stat-card:nth-child(3)::before{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.stat-card:nth-child(4)::before{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.stat-card .v{font-size:21px;font-weight:800}
+.stat-card:nth-child(1) .v{color:var(--p1)}
+.stat-card:nth-child(2) .v{color:var(--green)}
+.stat-card:nth-child(3) .v{color:var(--gold)}
+.stat-card:nth-child(4) .v{color:var(--purple)}
+.stat-card .k{font-size:11.5px;color:var(--muted)}
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.quick button{flex:1;min-width:100px;background:linear-gradient(135deg,#fff,#f8faff);border:1.5px solid #bfdbfe;color:var(--p1);border-radius:14px;padding:11px 8px;font-size:13px;font-weight:600;transition:all .15s}
+.quick button:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(29,78,216,.15);border-color:var(--p2)}
+.quick button:active{transform:translateY(0)}
+
+/* ---------- 表单 ---------- */
+.field{margin-bottom:10px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.field input,.field select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:11px 12px;font-size:14px;background:#fff;transition:all .15s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--p2);box-shadow:0 0 0 3px rgba(59,130,246,.14)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn-main{width:100%;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border:none;border-radius:14px;padding:13px;font-size:15px;font-weight:700;box-shadow:0 6px 16px rgba(29,78,216,.32);transition:all .15s}
+.btn-main:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(29,78,216,.4)}
+.btn-main:active{transform:translateY(1px)}
+.btn-main:disabled{background:#a5b8d8;box-shadow:none}
+.btn-line{background:#fff;border:1.5px solid #bfdbfe;color:var(--p1);border-radius:12px;padding:9px 14px;font-size:13px;font-weight:600;transition:all .15s}
+.btn-line:hover{background:#eff6ff;border-color:var(--p2)}
+.btn-gray{background:#fff;border:1.5px solid #cbd5e1;color:#64748b;border-radius:12px;padding:9px 14px;font-size:13px;transition:all .15s}
+.btn-gray:hover{border-color:#94a3b8}
+
+/* ---------- 列表 ---------- */
+.item{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:8px;font-size:13px;transition:all .15s}
+.item:hover{box-shadow:0 4px 12px rgba(15,23,42,.08);transform:translateY(-1px)}
+.item .t{font-weight:700}
+.item .d{font-size:11.5px;color:var(--muted)}
+.badge{display:inline-block;font-size:10.5px;border-radius:10px;padding:1px 9px;margin-left:6px;color:#fff;vertical-align:1px;font-weight:600}
+.bg-blue{background:var(--p1)} .bg-green{background:var(--green)} .bg-orange{background:var(--gold)} .bg-purple{background:var(--purple)} .bg-red{background:var(--red)}
+
+/* ---------- 链浏览器 ---------- */
+.blk{border:2px solid var(--line);border-radius:16px;padding:11px 13px;margin-bottom:10px;background:#fff;transition:all .15s}
+.blk:hover{box-shadow:0 6px 16px rgba(15,23,42,.09)}
+.blk.ok{border-color:#a7f3d0}
+.blk.bad{border-color:#fca5a5;background:#fef2f2}
+.blk .no{font-weight:800;font-size:14px}
+.blk .hash{font-family:Consolas,Menlo,monospace;font-size:10.5px;word-break:break-all;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:3px 7px;margin:3px 0;color:#475569}
+.blk .hr{font-size:10.5px;color:var(--muted)}
+.nodes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.node-card{border:1.5px solid #bfe3cd;border-radius:12px;padding:9px 11px;font-size:12px;background:#f0fdf6;transition:all .15s}
+.node-card:hover{transform:translateY(-1px)}
+.node-card.bad{border-color:#fca5a5;background:#fef2f2}
+.node-card .nd{font-weight:700}
+.node-card .ns{font-size:10.5px;color:var(--muted)}
+.statusline{padding:11px 13px;border-radius:12px;font-size:12.5px;font-weight:600;margin:8px 0;line-height:1.7}
+.statusline.ok{background:#f0fdf6;border:1px solid #bfe3cd;color:#065f46}
+.statusline.bad{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}
+
+/* ---------- 验证 ---------- */
+.verify-box{border:1.5px dashed #bfdbfe;border-radius:16px;padding:13px 15px;margin:10px 0;background:#f8faff}
+.hashbox{font-family:Consolas,Menlo,monospace;font-size:11px;word-break:break-all;background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:7px 9px;margin:6px 0;color:#475569}
+.vres{border-radius:12px;padding:11px 13px;font-size:13px;margin-top:8px;display:none;line-height:1.7}
+.vres.ok{display:block;background:#f0fdf6;border:1px solid #bfe3cd;color:#065f46}
+.vres.bad{display:block;background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}
+.vres.warn{display:block;background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+
+/* ---------- 底部导航 ---------- */
+.bottomnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;z-index:30;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 16px rgba(15,23,42,.06)}
+.bottomnav button{flex:1;background:none;border:none;padding:9px 0 7px;font-size:10.5px;color:#94a3b8;transition:all .15s;position:relative}
+.bottomnav button .ic{display:block;font-size:20px;transition:transform .15s}
+.bottomnav button.active{color:var(--p1);font-weight:700}
+.bottomnav button.active .ic{transform:scale(1.15)}
+.bottomnav button.active::after{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:22px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--p1),var(--p3))}
+
+/* ---------- 挖矿浮层 & 提示 ---------- */
+.minewrap{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;z-index:50;padding:10px 14px}
+.minebar{background:linear-gradient(120deg,#0b1f4b,#1d4ed8 70%,#4f46e5);color:#fff;border-radius:14px;padding:11px 14px;font-size:13px;font-weight:600;box-shadow:0 10px 26px rgba(29,78,216,.45);word-break:break-all;background-size:200% 100%;animation:shimmer 1.6s linear infinite}
+#toast{position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:60;background:rgba(15,23,42,.92);color:#fff;border-radius:12px;padding:10px 18px;font-size:13px;max-width:82%;opacity:0;transition:opacity .25s;pointer-events:none;box-shadow:0 10px 30px rgba(15,23,42,.35)}
+#toast.show{opacity:1}
+.hint-y{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:10px 13px;font-size:12.5px;margin-bottom:12px;line-height:1.7}
+.hint-y b{color:#78350f}
+
+/* ---------- 打印 ---------- */
+.print-area{display:none}
+@media print{
+  body *{visibility:hidden}
+  .print-area,.print-area *{visibility:visible}
+  .print-area{display:block !important;position:absolute;left:0;top:0;width:100%}
+}
+
+/* ---------- 动画 ---------- */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:0% 0}100%{background-position:200% 0}}
+
+@media(max-width:400px){.stats{grid-template-columns:1fr 1fr}.field-row{grid-template-columns:1fr}}
+.scan-box{position:relative;width:100%;max-width:280px;margin:0 auto;background:#0b1f33;border-radius:16px;overflow:hidden;aspect-ratio:1/1}
+.scan-box video{width:100%;height:100%;object-fit:cover;display:block;background:#0b1f33}
+.scan-frame{position:absolute;inset:14%;border:2px solid #f3d27a;border-radius:12px;box-shadow:0 0 0 999px rgba(3,20,31,.5);animation:scanpulse 2s ease infinite;pointer-events:none}
+@keyframes scanpulse{50%{border-color:#d4a943}}
+.qr-ph{width:110px;height:110px;border-radius:8px;border:1px solid var(--line);background:#fff;padding:5px;margin-top:8px;flex:none}
+.thumb{max-width:130px;max-height:130px;border-radius:10px;border:1px solid var(--line);display:block;margin-top:6px;box-shadow:0 4px 10px rgba(15,23,42,.12)}
+.brow{padding:6px 10px;border-radius:8px;font-size:13px;margin:4px 0;word-break:break-all}
+.brow.ok{background:#f0fdf6;border:1px solid #bfe3cd;color:#065f46}
+.brow.bad{background:#fef2f2;border:1px solid #fca5a5;color:#991b1b}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+<div class="minewrap hidden" id="mineWrap"><div class="minebar" id="mineText">⛏ 打包中…</div></div>
+
+<!-- ========== 登录 ========== -->
+<div id="screen-login" class="login-screen">
+  <div class="login-card">
+    <div class="logo">⛓️</div>
+    <h1>文博链 · 区块链平台</h1>
+    <p class="sub">RelicChain Platform v1.8（本地版 · 离线可用 · 手机浏览器打开即 APP）</p>
+    <p class="sub" id="loginMode" style="font-size:11.5px;margin-bottom:16px;color:#059669"></p>
+    <div class="role-list">
+      <button class="role-card" onclick="login('museum')"><div class="r-name">馆藏单位</div><div class="r-org">绵阳市博物馆</div><div class="r-desc">登记文物 · 发布授权</div></button>
+      <button class="role-card" onclick="login('exam')"><div class="r-name">检测机构</div><div class="r-org">文物检测中心</div><div class="r-desc">记录检测 / 修复事件</div></button>
+      <button class="role-card" onclick="login('admin')"><div class="r-name">平台管理员</div><div class="r-org">平台运营方</div><div class="r-desc">机构管理 · 审计日志</div></button>
+      <button class="role-card" onclick="login('public')"><div class="r-name">公众</div><div class="r-org">游客模式（只读）</div><div class="r-desc">验证真伪 · 浏览链</div></button>
+    </div>
+    <div class="cred hidden" id="credPanel">
+      <div class="field"><label>账号</label><input id="liUser" placeholder="请输入账号" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="field"><label>密码</label><input id="liPass" type="password" placeholder="请输入密码" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button type="button" class="btn-gray" id="passBtn" style="width:auto;margin-bottom:10px" onclick="togglePass()">👁 显示密码</button>
+      <div class="err" id="liErr"></div>
+      <button class="btn-main" onclick="doLogin()">🔐 登录</button>
+      <button class="btn-gray" style="width:100%;margin-top:8px" onclick="cancelLogin()">← 返回选择身份</button>
+    </div>
+    <p class="acchint">演示账号：馆藏单位 museum / 123456 ｜ 检测机构 exam / 123456 ｜ 管理员 admin / admin888 ｜ 公众点「游客模式」免登录</p>
+    <p class="foot-note">所有数据保存在本机浏览器 · 断网可用 · 双击即开</p>
+  </div>
+</div>
+
+<!-- ========== App ========== -->
+<div id="screen-app" class="app hidden">
+  <div class="app-header">
+    <div><div class="app-title">文博链平台</div><div class="app-sub" id="roleBadge"></div><div class="app-sub" id="netBadge" style="font-size:10px;opacity:.75"></div></div>
+    <button class="logout" onclick="logout()">退出</button>
+  </div>
+  <div class="main" id="main">
+
+    <div class="tab" id="tab-home">
+      <div class="stats" id="stats"></div>
+      <div class="quick" id="quickBtns"></div>
+      <div class="card"><h3>最新区块 <span class="tag">共 <span id="homeChainHint"></span> 块</span></h3><div id="homeBlocks"></div><button class="btn-line" style="width:100%;margin-top:6px" onclick="showTab('chain')">查看全部区块 →</button></div>
+    </div>
+
+    <div class="tab" id="tab-reg">
+      <div class="hint-y"><b>登记</b> = 给文物建立数字孪生并把指纹写上链。填好信息点「登记并上链」，等待挖矿完成即成功。</div>
+      <div class="card">
+        <h3>文物数字登记</h3>
+        <div class="field"><label>文物名称 *</label><input id="fName" placeholder="如：摩崖造像 · 说法图"></div>
+        <div class="field"><label>馆藏编号 *</label><input id="fCode" placeholder="如：碧水寺-009"></div>
+        <div class="field-row">
+          <div class="field"><label>年代</label><input id="fDynasty" placeholder="如：隋唐"></div>
+          <div class="field"><label>材质</label><input id="fMaterial" placeholder="如：砂岩"></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>文物等级</label><select id="fLevel"><option>一级</option><option>二级</option><option>三级</option><option>未定级</option></select></div>
+          <div class="field"><label>登记方</label><input id="fOrg" disabled></div>
+        </div>
+        <div class="field"><label>描述</label><input id="fDesc" placeholder="一句话描述（可选）"></div>
+        <div class="field">
+          <label>拍照取证（可选 · 照片指纹随登记上链）</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <label class="btn-line" for="fPhoto" style="display:inline-block">📸 拍照 / 选择照片</label>
+            <input type="file" id="fPhoto" accept="image/*" capture="environment" style="display:none" onchange="onPhotoPicked(this)">
+            <span id="fPhotoInfo" style="font-size:11.5px;color:var(--muted)">未取证</span>
+          </div>
+          <div id="fPhotoPreview"></div>
+        </div>
+        <button class="btn-main" id="btnReg" onclick="submitRegister()">📝 登记并上链</button>
+      </div>
+      <div class="card"><h3>本馆已登记文物</h3><div id="regList"></div></div>
+    </div>
+
+    <div class="tab" id="tab-trace">
+      <div class="hint-y"><b>溯源</b> = 给文物的每次检测、修复、借展留下不可篡改的记录。</div>
+      <div class="card">
+        <h3>记录溯源事件</h3>
+        <div class="field"><label>选择文物</label><select id="eArtifactSel"></select></div>
+        <div class="field"><label>事件类型</label><select id="eType"><option>检测记录</option><option>修复记录</option><option>借展记录</option><option>出版记录</option><option>其他</option></select></div>
+        <div class="field"><label>事件内容 *</label><input id="eNote" placeholder="如：2026-03 完成石质病害检测，无新增开裂"></div>
+        <div class="field">
+          <label>拍照取证（可选 · 证据照片指纹随事件上链）</label>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <label class="btn-line" for="ePhoto" style="display:inline-block">📸 拍照 / 选择照片</label>
+            <input type="file" id="ePhoto" accept="image/*" capture="environment" style="display:none" onchange="onEventPhotoPicked(this)">
+            <span id="ePhotoInfo" style="font-size:11.5px;color:var(--muted)">未取证</span>
+          </div>
+          <div id="ePhotoPreview"></div>
+        </div>
+        <button class="btn-main" onclick="submitEvent()">🧾 记录并上链</button>
+      </div>
+      <div class="card"><h3>最近溯源事件</h3><div id="eventList"></div></div>
+    </div>
+
+    <div class="tab" id="tab-lic">
+      <div class="hint-y"><b>授权</b> = 把数字资源授权给第三方使用，对象、用途、期限全程留痕。</div>
+      <div class="card">
+        <h3>数字资源授权</h3>
+        <div class="field"><label>选择文物</label><select id="lArtifactSel"></select></div>
+        <div class="field"><label>被授权方 *</label><input id="lGrantee" placeholder="如：上海XX文化创意有限公司"></div>
+        <div class="field"><label>授权用途 *</label><input id="lScope" placeholder="如：文创产品设计（不含三维模型外传）"></div>
+        <div class="field"><label>授权期限</label><input id="lTerm" placeholder="如：2026-04-01 至 2027-03-31"></div>
+        <button class="btn-main" onclick="submitLicense()">📜 授权并上链</button>
+      </div>
+      <div class="card"><h3>授权记录</h3><div id="licList"></div></div>
+    </div>
+
+    <div class="tab" id="tab-verify">
+      <div class="hint-y"><b>验证</b>：下载文物的"档案文件"→ 改一个字 → 上传验证，立刻知道真伪。</div>
+      <div class="card">
+        <h3>文件真伪验证</h3>
+        <div class="field"><label>选择文物</label><select id="vArtifactSel"></select></div>
+        <div class="verify-box">
+          <div style="font-size:12px;color:var(--muted)">该文物在链上的登记指纹（SHA-256）：</div>
+          <div class="hashbox" id="vFp">—</div>
+          <div style="display:flex;gap:12px;align-items:center;margin-top:10px">
+            <div class="qr-ph" id="vQrBox"></div>
+            <div style="flex:1;font-size:11.5px;color:var(--muted);line-height:1.8">
+              凭证扫码串（复制后用草料/微信生成真码打印张贴）：
+              <span class="hashbox" id="vQrText" style="display:block;margin:4px 0 6px">—</span>
+              <button class="btn-line" style="padding:3px 10px;font-size:11px" onclick="copyHash(document.getElementById('vQrText').textContent)">📋 复制扫码串</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-line" onclick="downloadFile('orig')">⬇ 下载档案文件</button>
+            <button class="btn-gray" onclick="downloadFile('tamper')">⬇ 下载被篡改示例</button>
+            <button class="btn-line" onclick="printCert()">🖨 打印凭证</button>
+            <button class="btn-line" onclick="showTab('scan')">📷 扫码核验</button>
+            <button class="btn-line" onclick="downloadCert()">⬇ 下载凭证文件</button>
+            <label class="btn-line" for="vUpload" style="display:inline-block">⇪ 上传验证</label>
+            <input type="file" id="vUpload" style="display:none">
+          </div>
+          <div class="vres" id="vResult"></div>
+        </div>
+        <div style="margin-top:10px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px">批量核验：一次选择多个档案文件（JSON），逐个比对链上指纹，适合验收/盘点场景。</div>
+          <label class="btn-line" for="batchInput" style="display:inline-block">📚 批量核验（可多选文件）</label>
+          <input type="file" id="batchInput" multiple style="display:none">
+          <div id="batchResult"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab" id="tab-scan">
+      <div class="hint-y"><b>扫一扫</b>：对准存证凭证上的二维码自动核验真伪；也支持手动输入凭证编号（如 碧水寺-001 或 RC:碧水寺-001:1）。</div>
+      <div class="card">
+        <h3>扫码核验</h3>
+        <div class="scan-box">
+          <video id="scanVideo" autoplay muted playsinline></video>
+          <div class="scan-frame"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn-main" id="btnScan" onclick="startScan()" style="flex:1">📷 开始扫描</button>
+          <button class="btn-gray" id="btnStopScan" onclick="stopScan()" style="display:none">⏹ 停止</button>
+          <button class="btn-gray" id="btnTorch" onclick="toggleTorch()" style="display:none">🔦 开灯</button>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>手动输入凭证编号 / 馆藏编号</label>
+          <div style="display:flex;gap:8px">
+            <input id="scanInput" placeholder="RC:碧水寺-001:1 或 碧水寺-001" onkeydown="if(event.key==='Enter')handleScan(this.value)">
+            <button class="btn-line" onclick="handleScan(document.getElementById('scanInput').value)">核验</button>
+          </div>
+        </div>
+        <div class="vres" id="scanResult"></div>
+      </div>
+    </div>
+
+    <div class="tab" id="tab-chain">
+      <div class="card">
+        <h3>链浏览器 <span class="tag">每一笔登记/事件/授权都是一个区块</span></h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <button class="btn-line" onclick="runValidate()">🔍 校验整条链</button>
+          <button class="btn-line" onclick="exportChain()">⬇ 导出区块数据</button>
+          <button class="btn-gray" id="btnNodeAttack" onclick="nodeAttack()">⚠ 模拟 1 个节点被篡改</button>
+        </div>
+        <div class="statusline ok" id="chainStatus">⏳ 校验中…</div>
+        <div class="nodes" id="nodes"></div>
+        <div id="chainList"></div>
+      </div>
+    </div>
+
+    <div class="tab" id="tab-admin">
+      <div class="card">
+        <h3>机构管理 <span class="tag">联盟链机构准入（管理员专属）</span></h3>
+        <div class="field-row">
+          <div class="field"><label>机构名称</label><input id="oName" placeholder="如：XX大学文博学院"></div>
+          <div class="field"><label>机构类型</label><select id="oType"><option>馆藏单位</option><option>检测机构</option><option>主管部门</option><option>公证机构</option><option>研究机构</option></select></div>
+        </div>
+        <button class="btn-main" onclick="addOrg()">➕ 准入新机构</button>
+        <div id="orgList" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <h3>账号管理 <span class="tag">为机构开设登录账号</span></h3>
+        <div class="field-row">
+          <div class="field"><label>机构名称</label><input id="aOrg" placeholder="如：XX研究院"></div>
+          <div class="field"><label>机构类型</label><select id="aType"><option value="museum">馆藏单位</option><option value="exam">检测机构</option></select></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>账号</label><input id="aUser" placeholder="登录账号"></div>
+          <div class="field"><label>密码</label><input id="aPass" placeholder="登录密码"></div>
+        </div>
+        <button class="btn-main" onclick="addAccount()">➕ 创建账号</button>
+        <div id="accList" style="margin-top:10px"></div>
+      </div>
+      <div class="card">
+        <h3>审计日志 <span class="tag">谁 · 何时 · 做了什么，全程留痕</span></h3>
+        <button class="btn-line" onclick="exportAudit()" style="margin-bottom:8px">⬇ 导出审计日志</button>
+        <div id="auditList"></div>
+      </div>
+      <div class="card">
+        <h3>平台概览</h3>
+        <div id="adminStats"></div>
+      </div>
+    </div>
+
+    <div class="tab" id="tab-me">
+      <div class="card">
+        <h3>当前身份</h3>
+        <div id="meInfo"></div>
+      </div>
+      <div class="card">
+        <h3>挖矿难度（新块生效）</h3>
+        <select id="diffSel" onchange="setDiff(this.value)" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid var(--line);font-size:14px">
+          <option value="1">1（快 · 适合演示）</option>
+          <option value="2" selected>2（默认）</option>
+          <option value="3">3（慢 · 体验真实难度）</option>
+        </select>
+      </div>
+      <div class="card">
+        <h3>数据管理</h3>
+        <div class="hint-y" style="margin-bottom:10px">所有数据只存在本机浏览器里（localStorage），不上传任何服务器。换设备前请先备份，再在新设备恢复。</div>
+        <button class="btn-line" style="width:100%;margin-bottom:8px" onclick="backupAll()">💾 备份全部数据（下载 JSON）</button>
+        <button class="btn-line" style="width:100%" onclick="document.getElementById('restoreInput').click()">📥 恢复数据（导入备份文件）</button>
+        <input type="file" id="restoreInput" accept=".json,application/json" style="display:none">
+        <button class="btn-main" style="background:var(--red);margin-top:8px" onclick="resetAll()">🗑 重置全部数据（恢复出厂）</button>
+      </div>
+      <div class="card">
+        <h3>关于</h3>
+        <div class="item"><div class="t">文博链 RelicChain Platform v1.8</div><div class="d">真实 SHA-256 工作量证明 · 4 节点共识展示 · 离线可用。配套：《平台使用手册.md》</div></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="print-area" id="printArea"></div>
+  <div class="bottomnav" id="bottomnav"></div>
+</div>
+<script>
+/* ================= 全局状态 ================= */
+var CHAIN = [];        /* 区块数组 */
+var ARTIFACTS = [];    /* 已登记文物（数字孪生） */
+var ROLE = null;       /* 当前登录角色 */
+var DIFF = 2;
+var busy = false;
+var nodeAttacked = false;
+var ORGS = [];       /* 联盟机构（管理员准入） */
+var AUDIT = [];      /* 审计日志（管理员可见） */
+var ACCOUNTS = [];   /* 平台登录账号 */
+var LOGINED = null;  /* 当前登录账号 */
+var pendingRole = null;
+var LS = 'rc_platform_v2';
+var API = (location.protocol.indexOf('http') === 0);
+function apiGet(url){ return fetch(url).then(function(r){ return r.json(); }); }
+function apiPost(url, obj){
+  return fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(obj || {}) }).then(function(r){ return r.json(); });
+}
+function resync(){
+  apiGet('/api/state').then(function(st){
+    if (st && st.chain){
+      CHAIN = st.chain; ARTIFACTS = st.artifacts || []; ORGS = st.orgs || [];
+      AUDIT = st.audit || []; ACCOUNTS = st.accounts || []; DIFF = st.diff || 2;
+      renderAll();
+    }
+  });
+}
+
+var ROLES = {
+  museum: { name:'馆藏单位', org:'绵阳市博物馆', perm:{reg:true, event:true, lic:true} },
+  exam:   { name:'检测机构', org:'文物检测中心', perm:{reg:false, event:true, lic:false} },
+  public: { name:'公众', org:'游客模式', perm:{reg:false, event:false, lic:false} },
+  admin:  { name:'平台管理员', org:'平台运营方', perm:{reg:true, event:true, lic:true}, isAdmin:true }
+};
+var NODES = ['节点1 · 主管部门','节点2 · 绵阳市博物馆','节点3 · 公证机构','节点4 · 平台运营方'];
+var NAV = {
+  staff: [['home','首页','🏠'],['reg','登记','📝'],['trace','溯源','🧾'],['lic','授权','📜'],['scan','扫一扫','📷'],['chain','链','⛓️'],['me','我的','👤']],
+  admin: [['home','首页','🏠'],['reg','登记','📝'],['trace','溯源','🧾'],['lic','授权','📜'],['scan','扫一扫','📷'],['chain','链','⛓️'],['admin','管理','🛠️'],['me','我的','👤']],
+  exam:  [['home','首页','🏠'],['trace','溯源','🧾'],['scan','扫一扫','📷'],['chain','链','⛓️'],['me','我的','👤']],
+  pub:   [['home','首页','🏠'],['verify','验证','🔍'],['scan','扫一扫','📷'],['chain','链','⛓️'],['me','我的','👤']]
+};
+var TYPE_BADGE = { GENESIS:['系统','bg-purple'], REGISTER:['登记','bg-blue'], EVENT:['溯源','bg-green'], LICENSE:['授权','bg-orange'] };
+
+/* ================= 工具 ================= */
+function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function buf2hex(buf){ return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
+function sha256Hex(str){
+  if (!window.crypto || !window.crypto.subtle) return Promise.resolve(null);
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(buf2hex);
+}
+function blockStr(b){ return b.index + '|' + b.prevHash + '|' + b.time + '|' + JSON.stringify(b.data) + '|' + b.nonce; }
+function targetOf(d){ var s=''; for(var i=0;i<d;i++){ s+='0'; } return s; }
+function short(h){ if(!h) return ''; return h.slice(0,12) + '…' + h.slice(-8); }
+function fmtTime(t){ return new Date(t).toLocaleString('zh-CN', {hour12:false}); }
+function artifactOf(code){ for(var i=0;i<ARTIFACTS.length;i++){ if(ARTIFACTS[i].code === code) return ARTIFACTS[i]; } return null; }
+function canonicalArtifact(a){
+  var o = {name:a.name, code:a.code, dynasty:a.dynasty, material:a.material, level:a.level, desc:a.desc, org:a.org};
+  if (a.photoHash) o.photoHash = a.photoHash;
+  return JSON.stringify(o, null, 2);
+}
+function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tm);
+  t._tm = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+function setMine(text){
+  var w = document.getElementById('mineWrap');
+  if (text){ document.getElementById('mineText').textContent = text; w.classList.remove('hidden'); }
+  else { w.classList.add('hidden'); }
+}
+
+/* ================= 存储 ================= */
+function save(){
+  if (API) return;
+  try{ localStorage.setItem(LS, JSON.stringify({chain:CHAIN, artifacts:ARTIFACTS, role:ROLE, diff:DIFF, orgs:ORGS, audit:AUDIT, accounts:ACCOUNTS, account:LOGINED})); }catch(e){}
+}
+function load(){
+  if (API) return false;
+  try{
+    var d = JSON.parse(localStorage.getItem(LS));
+    if (d && d.chain && d.chain.length){ CHAIN = d.chain; ARTIFACTS = d.artifacts || []; ROLE = d.role || null; DIFF = d.diff || 2; ORGS = d.orgs || []; AUDIT = d.audit || []; ACCOUNTS = d.accounts || []; LOGINED = d.account || null; return true; }
+  }catch(e){}
+  return false;
+}
+function resetAll(){
+  if (confirm('确定清空平台全部数据并恢复初始示例吗？此操作不可撤销。')){
+    if (API){ apiPost('/api/reset', {}).then(function(){ location.reload(); }); return; }
+    localStorage.removeItem(LS);
+    location.reload();
+  }
+}
+
+/* ================= 挖矿（工作量证明） ================= */
+async function mineBlock(b){
+  var target = targetOf(b.diff);
+  b.nonce = 0;
+  setMine('⛏ 正在打包区块 #' + b.index + '：尝试 nonce，直到哈希以 ' + b.diff + ' 个 0 开头（尝试 0 次）…');
+  while(true){
+    b.nonce++;
+    if (b.nonce % 150 === 0){
+      setMine('⛏ 正在打包区块 #' + b.index + '：尝试 nonce，直到哈希以 ' + b.diff + ' 个 0 开头（已尝试 ' + b.nonce + ' 次）…');
+      await sleep(0);
+    }
+    var h = await sha256Hex(blockStr(b));
+    if (h === null){ setMine(''); toast('❌ 浏览器不支持本地哈希，请用最新版 Chrome/Edge'); return false; }
+    if (h.slice(0, b.diff) === target){ b.hash = h; setMine(''); return true; }
+  }
+}
+
+/* ================= 出块与共识展示 ================= */
+async function addBlock(data, silent){
+  if (busy) return null;
+  busy = true;
+  if (API){
+    setMine('⛏ 服务端正在打包区块（真实挖矿）…');
+    var r = await apiPost('/api/block', { data: data, diff: DIFF });
+    setMine('');
+    if (!r || !r.ok){ busy = false; toast('❌ 服务端上链失败'); return null; }
+    CHAIN.push(r.block);
+    if (!silent){ renderChainTab(); renderNodes(); }
+    busy = false;
+    return r.block;
+  }
+  var b = { index:CHAIN.length, prevHash: CHAIN.length ? CHAIN[CHAIN.length-1].hash : '0'.repeat(64),
+            time: Date.now(), diff: DIFF, nonce:0, hash:'', conf:0, bad:false, data:data };
+  CHAIN.push(b);
+  if (!silent) renderChainTab();
+  var ok = await mineBlock(b);
+  if (!ok){ busy = false; return null; }
+  /* 共识展示：其他 3 个节点逐一致认 */
+  for (var c = 1; c <= 4; c++){
+    b.conf = c;
+    if (!silent){ renderNodes(); if (c < 4) await sleep(160); }
+  }
+  save();
+  busy = false;
+  return b;
+}
+
+/* ================= 初始数据 ================= */
+async function seedChain(){
+  var t0 = Date.now();
+  var saveDiff = DIFF;
+  DIFF = 1; /* 种子数据用低难度快速生成 */
+  var ok1 = await addBlock({type:'GENESIS', content:'创世区块 · RelicChain 平台启动（碧水寺摩崖造像数字档案）', org:'平台运营方'}, true);
+  if (!ok1){ DIFF = saveDiff; return; }
+  CHAIN[CHAIN.length-1].diff = 1;
+  var seeds = [
+    { name:'摩崖造像 · 主尊龛', code:'碧水寺-001', dynasty:'隋', material:'砂岩', level:'一级', desc:'主尊造像，三维扫描建档' },
+    { name:'摩崖造像 · 说法图', code:'碧水寺-002', dynasty:'隋', material:'砂岩', level:'一级', desc:'说法图龛，三维扫描建档' },
+    { name:'摩崖造像 · 胁侍菩萨龛', code:'碧水寺-003', dynasty:'唐', material:'砂岩', level:'二级', desc:'胁侍菩萨造像龛，三维扫描建档' },
+    { name:'碑刻 · 题记', code:'碧水寺-004', dynasty:'隋', material:'石灰岩', level:'二级', desc:'题记碑刻，高精度数字化' }
+  ];
+  for (var i = 0; i < seeds.length; i++){
+    var s = seeds[i];
+    var a = { name:s.name, code:s.code, dynasty:s.dynasty, material:s.material, level:s.level, desc:s.desc, org:'绵阳市博物馆', time:t0 + (i+1)*60000 };
+    a.fp = await sha256Hex(canonicalArtifact(a));
+    ARTIFACTS.push(a);
+    await addBlock({type:'REGISTER', artifactId:a.code, name:a.name, level:a.level, fingerprint:a.fp, org:a.org}, true);
+  }
+  await addBlock({type:'EVENT', artifactId:'碧水寺-001', name:'摩崖造像 · 主尊龛', eventType:'检测记录', content:'2026-03 完成石质病害检测，无新增开裂', org:'文物检测中心'}, true);
+  await addBlock({type:'EVENT', artifactId:'碧水寺-002', name:'摩崖造像 · 说法图', eventType:'修复记录', content:'2026-04 表层粉化加固处理完成', org:'文物检测中心'}, true);
+  await addBlock({type:'LICENSE', artifactId:'碧水寺-001', name:'摩崖造像 · 主尊龛', grantee:'上海XX文化创意有限公司', scope:'数字展览与文创设计（不含三维模型外传）', term:'2026-04-01 至 2027-03-31', content:'授权「上海XX文化创意有限公司」用于数字展览与文创设计', org:'绵阳市博物馆'}, true);
+  DIFF = saveDiff;
+  audit('系统', '平台初始化', '创建创世区块、4 件示例文物、2 条事件、1 条授权');
+  save();
+}
+/* ================= 导出与凭证打印 ================= */
+function backupAll(){
+  if (API){
+    apiGet('/api/backup').then(function(obj){
+      exportJson('relicchain-服务端备份-' + new Date().toISOString().slice(0,10) + '.json', obj);
+      toast('✅ 服务端全量备份已下载');
+    });
+    return;
+  }
+  var obj = { platform:'RelicChain Platform v1.8', exportedAt:new Date().toISOString(),
+              chain:CHAIN, artifacts:ARTIFACTS, orgs:ORGS, audit:AUDIT, accounts:ACCOUNTS, diff:DIFF };
+  exportJson('relicchain-全量备份-' + new Date().toISOString().slice(0,10) + '.json', obj);
+  toast('✅ 全量备份已下载（链 ' + (CHAIN.length - 1) + ' 块 / 文物 ' + ARTIFACTS.length + ' 件 / 审计 ' + AUDIT.length + ' 条）');
+  audit(ROLE.org, '数据备份', '导出全量备份');
+}
+function restoreAll(file){
+  if (API){
+    var fr2 = new FileReader();
+    fr2.onload = function(){
+      try{
+        var d2 = JSON.parse(fr2.result);
+        if (!d2 || !d2.chain || !d2.chain.length){ toast('❌ 备份文件无效'); return; }
+        if (!confirm('恢复将覆盖服务端当前全部数据。确定继续？')) return;
+        apiPost('/api/restore', d2).then(function(r){
+          if (r && r.ok){ toast('✅ 服务端数据已恢复，正在刷新…'); setTimeout(function(){ location.reload(); }, 800); }
+          else toast('❌ 恢复失败');
+        });
+      }catch(e){ toast('❌ 备份文件解析失败'); }
+    };
+    fr2.readAsText(file);
+    return;
+  }
+  var fr = new FileReader();
+  fr.onload = function(){
+    try{
+      var d = JSON.parse(fr.result);
+      if (!d || !d.chain || !d.chain.length){ toast('❌ 备份文件无效'); return; }
+      if (!confirm('恢复将覆盖当前全部数据（现有区块 ' + (CHAIN.length - 1) + ' 个 → 备份 ' + (d.chain.length - 1) + ' 个）。确定继续？')) return;
+      CHAIN = d.chain; ARTIFACTS = d.artifacts || [];
+      ORGS = d.orgs || []; AUDIT = d.audit || [];
+      ACCOUNTS = d.accounts || []; DIFF = d.diff || 2;
+      save();
+      audit('系统', '数据恢复', '从备份恢复（' + CHAIN.length + ' 块）');
+      toast('✅ 数据已恢复，正在刷新…');
+      setTimeout(function(){ location.reload(); }, 800);
+    }catch(e){ toast('❌ 备份文件解析失败'); }
+  };
+  fr.readAsText(file);
+}
+document.getElementById('restoreInput').addEventListener('change', function(ev){
+  var f = ev.target.files[0];
+  if (f) restoreAll(f);
+  ev.target.value = '';
+});
+function exportJson(filename, obj){
+  var blob = new Blob([JSON.stringify(obj, null, 2)], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  link.href = url; link.download = filename;
+  document.body.appendChild(link); link.click();
+  document.body.removeChild(link); URL.revokeObjectURL(url);
+}
+function exportChain(){
+  exportJson('relicchain-区块数据-' + new Date().toISOString().slice(0,10) + '.json',
+    { platform:'RelicChain Platform v1.8', exportedAt:new Date().toISOString(), chain:CHAIN, artifacts:ARTIFACTS });
+  toast('✅ 全部区块数据已导出（JSON 文件）');
+  audit(ROLE.org, '数据导出', '导出全部区块数据（' + CHAIN.length + ' 块）');
+}
+function exportAudit(){
+  exportJson('relicchain-审计日志-' + new Date().toISOString().slice(0,10) + '.json',
+    { platform:'RelicChain Platform v1.8', exportedAt:new Date().toISOString(), audit:AUDIT });
+  toast('✅ 审计日志已导出（JSON 文件）');
+  audit(ROLE.org, '数据导出', '导出审计日志（' + AUDIT.length + ' 条）');
+}
+function certHtml(a){
+  var reg = null;
+  CHAIN.forEach(function(b){ if (b.data.type === 'REGISTER' && b.data.artifactId === a.code) reg = b; });
+  var certNo = reg ? ('RC-' + reg.index + '-' + reg.hash.slice(0, 8).toUpperCase()) : ('RC-' + a.code);
+  return '<div style="font-family:SimSun,serif;color:#000;border:3px double #1d4ed8;border-radius:10px;padding:28px 32px;max-width:720px;margin:0 auto;background:#fff">' +
+    '<h2 style="text-align:center;letter-spacing:6px;margin:0 0 4px">文物数字存证凭证</h2>' +
+    '<p style="text-align:center;color:#555;font-size:13px;margin:0 0 18px">RelicChain 文博链 · 数字资产登记证明</p>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
+    '<tr><td style="border:1px solid #999;padding:8px;width:120px;background:#eff6ff">凭证编号</td><td style="border:1px solid #999;padding:8px">' + certNo + '</td></tr>' +
+    '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">文物名称</td><td style="border:1px solid #999;padding:8px">' + esc(a.name) + '</td></tr>' +
+    '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">馆藏编号</td><td style="border:1px solid #999;padding:8px">' + esc(a.code) + '</td></tr>' +
+    '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">年代 / 材质</td><td style="border:1px solid #999;padding:8px">' + esc(a.dynasty) + ' / ' + esc(a.material) + '</td></tr>' +
+    '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">文物等级</td><td style="border:1px solid #999;padding:8px">' + esc(a.level) + '</td></tr>' +
+    '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">登记机构</td><td style="border:1px solid #999;padding:8px">' + esc(a.org) + '</td></tr>' +
+    '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">登记时间</td><td style="border:1px solid #999;padding:8px">' + (reg ? fmtTime(reg.time) : '—') + '</td></tr>' +
+    '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">所在区块</td><td style="border:1px solid #999;padding:8px">' + (reg ? ('#' + reg.index) : '—') + '</td></tr>' +
+    (a.photoHash ? '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">取证照片</td><td style="border:1px solid #999;padding:8px;font-family:Consolas,monospace;font-size:11px;word-break:break-all">0x' + a.photoHash + '</td></tr>' : '') +
+    '<tr><td style="border:1px solid #999;padding:8px;background:#eff6ff">存证指纹</td><td style="border:1px solid #999;padding:8px;font-family:Consolas,monospace;font-size:11px;word-break:break-all">0x' + a.fp + '</td></tr>' +
+    '</table>' +
+    '<p style="font-size:12px;color:#444;margin-top:16px;line-height:1.8">本凭证证明上述文物的数字化档案已完成链上登记，其内容指纹（SHA-256）与链上记录一致。任何人对档案文件做任何改动，指纹即变化，可通过平台「验证」功能复验。</p>' +
+    '<div style="display:flex;justify-content:space-between;margin-top:26px;font-size:13px">' +
+    '<span>签发：' + esc(ROLE.org) + '</span><span>打印时间：' + fmtTime(Date.now()) + '</span></div>' +
+    '</div>';
+}
+function printCert(){
+  var a = artifactOf(document.getElementById('vArtifactSel').value);
+  if (!a){ toast('请先选择文物'); return; }
+  document.getElementById('printArea').innerHTML = certHtml(a);
+  audit(ROLE.org, '凭证打印', '打印存证凭证：' + a.code);
+  window.print();
+}
+function downloadCert(){
+  var a = artifactOf(document.getElementById('vArtifactSel').value);
+  if (!a){ toast('请先选择文物'); return; }
+  var full = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><title>文物数字存证凭证 - ' + a.code + '</title></head><body style="background:#eef2f7;padding:24px">' + certHtml(a) + '</body></html>';
+  var blob = new Blob([full], {type:'text/html;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  link.href = url; link.download = '存证凭证-' + a.code + '.html';
+  document.body.appendChild(link); link.click();
+  document.body.removeChild(link); URL.revokeObjectURL(url);
+  toast('✅ 凭证文件已下载（HTML，可打印/另存 PDF）');
+  audit(ROLE.org, '凭证下载', '下载存证凭证：' + a.code);
+}
+
+/* ================= 扫一扫（相机扫码核验） ================= */
+var scanStream = null;
+var scanTimer = null;
+var torchOn = false;
+async function toggleTorch(){
+  if (!scanStream){ toast('请先开始扫描'); return; }
+  var track = scanStream.getVideoTracks()[0];
+  if (!track || !track.getCapabilities || !track.getCapabilities().torch){
+    toast('当前设备/浏览器不支持手电筒');
+    return;
+  }
+  torchOn = !torchOn;
+  try{
+    await track.applyConstraints({ advanced: [{ torch: torchOn }] });
+  }catch(e){
+    toast('手电筒切换失败');
+    torchOn = !torchOn;
+    return;
+  }
+  var btn = document.getElementById('btnTorch');
+  if (btn) btn.textContent = torchOn ? '🔦 关灯' : '🔦 开灯';
+  toast(torchOn ? '🔦 手电筒已打开' : '手电筒已关闭');
+}
+function pseudoQrSvg(seed){
+  var n = 21, size = 96, cell = size / n;
+  var sv = '<svg viewBox="0 0 ' + size + ' ' + size + '" width="96" height="96" xmlns="http://www.w3.org/2000/svg"><rect width="' + size + '" height="' + size + '" fill="#ffffff"/>';
+  var s = 0;
+  for (var i = 0; i < seed.length; i++){ s += seed.charCodeAt(i); }
+  function inFinder(r, c){ return (r < 8 && c < 8) || (r < 8 && c >= n - 8) || (r >= n - 8 && c < 8); }
+  function finder(r0, c0){
+    sv += '<rect x="' + (c0 * cell) + '" y="' + (r0 * cell) + '" width="' + (7 * cell) + '" height="' + (7 * cell) + '" fill="#0b1f33"/>';
+    sv += '<rect x="' + ((c0 + 1) * cell) + '" y="' + ((r0 + 1) * cell) + '" width="' + (5 * cell) + '" height="' + (5 * cell) + '" fill="#ffffff"/>';
+    sv += '<rect x="' + ((c0 + 2) * cell) + '" y="' + ((r0 + 2) * cell) + '" width="' + (3 * cell) + '" height="' + (3 * cell) + '" fill="#0b1f33"/>';
+  }
+  finder(0, 0); finder(0, n - 7); finder(n - 7, 0);
+  for (var r = 0; r < n; r++){
+    for (var c = 0; c < n; c++){
+      if (inFinder(r, c)) continue;
+      if ((r * 31 + c * 17 + s) % 11 < 5){
+        sv += '<rect x="' + (c * cell) + '" y="' + (r * cell) + '" width="' + (cell + 0.4) + '" height="' + (cell + 0.4) + '" fill="#0b1f33"/>';
+      }
+    }
+  }
+  return sv + '</svg>';
+}
+function renderScan(){
+  var r = document.getElementById('scanResult');
+  r.className = 'vres'; r.innerHTML = '';
+  var bs = document.getElementById('btnScan'); if (bs) bs.style.display = '';
+  var bst = document.getElementById('btnStopScan'); if (bst) bst.style.display = 'none';
+  var bt = document.getElementById('btnTorch'); if (bt){ bt.style.display = 'none'; bt.textContent = '🔦 开灯'; }
+  torchOn = false;
+}
+async function startScan(){
+  var video = document.getElementById('scanVideo');
+  if (!('BarcodeDetector' in window)){
+    toast('当前浏览器不支持扫码识别，请手动输入凭证编号');
+    return;
+  }
+  if (scanStream){ stopScan(); }
+  try{
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    video.srcObject = scanStream;
+    await video.play();
+    document.getElementById('btnScan').style.display = 'none';
+    document.getElementById('btnStopScan').style.display = '';
+    document.getElementById('btnTorch').style.display = '';
+    var detector = new BarcodeDetector({ formats: ['qr_code'] });
+    scanTimer = setInterval(async function(){
+      if (video.readyState >= 2){
+        try{
+          var codes = await detector.detect(video);
+          if (codes && codes.length){
+            stopScan();
+            handleScan(codes[0].rawValue);
+          }
+        }catch(e){}
+      }
+    }, 350);
+  }catch(e){
+    toast('无法打开摄像头（' + (e && e.message ? e.message : '权限被拒') + '），请手动输入凭证编号');
+  }
+}
+function stopScan(){
+  if (scanTimer){ clearInterval(scanTimer); scanTimer = null; }
+  if (scanStream){
+    scanStream.getTracks().forEach(function(tr){ tr.stop(); });
+    scanStream = null;
+  }
+  var video = document.getElementById('scanVideo');
+  if (video){ video.srcObject = null; }
+  var bs = document.getElementById('btnScan'); if (bs) bs.style.display = '';
+  var bst = document.getElementById('btnStopScan'); if (bst) bst.style.display = 'none';
+  var bt = document.getElementById('btnTorch'); if (bt){ bt.style.display = 'none'; bt.textContent = '🔦 开灯'; }
+  torchOn = false;
+}
+function handleScan(text){
+  var raw = (text || '').trim();
+  if (!raw){ toast('请输入凭证编号'); return; }
+  var code = null;
+  if (raw.indexOf('RC:') === 0){
+    code = raw.split(':')[1];
+  } else {
+    var m = raw.match(/碧水寺-\d+/);
+    if (m) code = m[0];
+  }
+  var r = document.getElementById('scanResult');
+  var a = code ? artifactOf(code) : null;
+  if (!a){
+    r.className = 'vres bad';
+    r.innerHTML = '<b>❌ 未找到该凭证</b>：平台上没有「' + esc(raw) + '」的登记记录——可能是伪造或未登记。';
+  } else {
+    var reg = null;
+    CHAIN.forEach(function(b){ if (b.data.type === 'REGISTER' && b.data.artifactId === a.code) reg = b; });
+    r.className = 'vres ok';
+    r.innerHTML = '<b>✅ 链上核验通过</b><br>文物：' + esc(a.name) + '<br>馆藏编号：' + esc(a.code) +
+      '<br>等级：' + esc(a.level) + ' · 年代：' + esc(a.dynasty) + '<br>登记机构：' + esc(a.org) +
+      (reg ? '<br>所在区块：# ' + reg.index + ' · 4/4 节点确认' : '') +
+      (a.photoHash ? '<br>取证照片指纹：0x' + a.photoHash.slice(0, 18) + '…' : '') +
+      '<br><span style="word-break:break-all">指纹：0x' + a.fp + '</span>';
+  }
+  var si = document.getElementById('scanInput');
+  if (si) si.value = '';
+  audit(ROLE ? ROLE.name : '游客', '扫码核验', '核验「' + raw + '」→ ' + (a ? '通过' : '未找到'));
+}
+
+/* ================= 审计与机构管理 ================= */
+function audit(actor, action, detail){
+  AUDIT.push({ time: Date.now(), actor: actor, action: action, detail: detail });
+  if (AUDIT.length > 200) AUDIT = AUDIT.slice(-200);
+  if (API){ apiPost('/api/audit', { actor: actor, action: action, detail: detail }); return; }
+  save();
+}
+function capabilityText(){
+  if (!ROLE) return '未登录';
+  var p = ROLE.perm || {};
+  var s = [];
+  if (p.reg) s.push('登记文物');
+  if (p.event) s.push('记录溯源');
+  if (p.lic) s.push('发布授权');
+  if (ROLE.isAdmin) s.push('机构管理');
+  s.push('验证真伪'); s.push('链浏览');
+  return '可操作：' + s.join(' / ');
+}
+function addOrg(){
+  var name = document.getElementById('oName').value.trim();
+  var type = document.getElementById('oType').value;
+  if (!name){ toast('请填写机构名称'); return; }
+  if (API){
+    apiPost('/api/orgs', { name: name, type: type, actor: ROLE.org }).then(function(r){
+      if (r && r.ok){ ORGS = r.orgs || ORGS; document.getElementById('oName').value = ''; resync(); toast('✅ 机构已准入（已同步到服务端）'); }
+      else toast('❌ 服务端操作失败');
+    });
+    return;
+  }
+  ORGS.push({ id:'ORG' + Date.now(), name:name, type:type, status:true, time:Date.now() });
+  audit(ROLE.org, '机构管理', '准入新机构：' + name + '（' + type + '）');
+  document.getElementById('oName').value = '';
+  renderOrgs(); renderAdminStats();
+  toast('✅ 机构已准入，写入审计日志');
+}
+function toggleOrg(id){
+  if (API){
+    apiPost('/api/org-toggle', { id: id, actor: ROLE.org }).then(function(r){
+      if (r && r.ok){ ORGS = r.orgs || ORGS; resync(); }
+    });
+    return;
+  }
+  ORGS.forEach(function(o){
+    if (o.id === id){ o.status = !o.status; audit(ROLE.org, '机构管理', (o.status ? '启用' : '停用') + '机构：' + o.name); }
+  });
+  renderOrgs(); renderAdminStats();
+}
+function renderOrgs(){
+  if (!ORGS.length){
+    ORGS = [
+      { id:'ORG1', name:'绵阳市文物局', type:'主管部门', status:true, time:Date.now() },
+      { id:'ORG2', name:'绵阳市博物馆', type:'馆藏单位', status:true, time:Date.now() },
+      { id:'ORG3', name:'绵州公证处', type:'公证机构', status:true, time:Date.now() },
+      { id:'ORG4', name:'文物检测中心', type:'检测机构', status:true, time:Date.now() }
+    ];
+    save();
+  }
+  var el = document.getElementById('orgList');
+  if (!el) return;
+  el.innerHTML = ORGS.map(function(o){
+    return '<div class="item"><div class="t">' + esc(o.name) + (o.status ? ' <span class="badge bg-green">启用</span>' : ' <span class="badge bg-red">停用</span>') + '</div>' +
+      '<div class="d">' + esc(o.type) + ' · 准入时间 ' + fmtTime(o.time) + '</div>' +
+      '<button class="btn-gray" style="margin-top:6px" onclick="toggleOrg(\'' + o.id + '\')">' + (o.status ? '停用' : '启用') + '</button></div>';
+  }).join('');
+}
+function renderAudit(){
+  var el = document.getElementById('auditList');
+  if (!el) return;
+  var list = AUDIT.slice(-20).reverse().map(function(a){
+    return '<div class="item"><div class="t">' + esc(a.actor) + ' · ' + esc(a.action) + '</div><div class="d">' + fmtTime(a.time) + ' · ' + esc(a.detail) + '</div></div>';
+  }).join('');
+  el.innerHTML = list || '<div class="item"><div class="d">暂无日志。</div></div>';
+}
+function renderAdminStats(){
+  var el = document.getElementById('adminStats');
+  if (!el) return;
+  var active = ORGS.filter(function(o){ return o.status; }).length;
+  el.innerHTML = '<div class="stats">' +
+    '<div class="stat-card"><div class="v">' + ORGS.length + '</div><div class="k">准入机构</div></div>' +
+    '<div class="stat-card"><div class="v">' + active + '</div><div class="k">启用中</div></div>' +
+    '<div class="stat-card"><div class="v">' + CHAIN.length + '</div><div class="k">区块总数</div></div>' +
+    '<div class="stat-card"><div class="v">' + AUDIT.length + '</div><div class="k">审计日志</div></div></div>';
+}
+function renderAdmin(){
+  renderOrgs(); renderAudit(); renderAdminStats(); renderAccounts();
+}
+function addAccount(){
+  var org = document.getElementById('aOrg').value.trim();
+  var user = document.getElementById('aUser').value.trim();
+  var pass = document.getElementById('aPass').value;
+  if (!org || !user || !pass){ toast('请填写机构、账号、密码'); return; }
+  if (API){
+    apiPost('/api/accounts', { user: user, pass: pass, org: org, type: document.getElementById('aType').value, actor: ROLE.org }).then(function(r){
+      if (r && r.ok){ document.getElementById('aOrg').value=''; document.getElementById('aUser').value=''; document.getElementById('aPass').value=''; ACCOUNTS = r.accounts || ACCOUNTS; renderAccounts(); toast('✅ 账号已创建（密码服务端哈希存储）'); }
+      else toast((r && r.msg) ? r.msg : '❌ 创建失败');
+    });
+    return;
+  }
+  var dup = false;
+  ACCOUNTS.forEach(function(x){ if (x.user === user) dup = true; });
+  if (dup){ toast('该账号已存在'); return; }
+  ACCOUNTS.push({ id:'A' + Date.now(), user:user, pass:pass, org:org, type:document.getElementById('aType').value });
+  audit(ROLE.org, '账号管理', '创建账号：' + user + '（' + org + '）');
+  document.getElementById('aOrg').value = '';
+  document.getElementById('aUser').value = '';
+  document.getElementById('aPass').value = '';
+  renderAccounts();
+  toast('✅ 账号已创建，可用它登录');
+}
+function delAccount(id){
+  if (API){
+    apiPost('/api/account-del', { id: id, actor: ROLE.org }).then(function(r){
+      if (r && r.ok){ ACCOUNTS = r.accounts || ACCOUNTS; renderAccounts(); }
+    });
+    return;
+  }
+  ACCOUNTS = ACCOUNTS.filter(function(x){ return x.id !== id; });
+  audit(ROLE.org, '账号管理', '删除账号：' + id);
+  renderAccounts();
+  save();
+}
+function renderAccounts(){
+  var el = document.getElementById('accList');
+  if (!el) return;
+  el.innerHTML = ACCOUNTS.map(function(x){
+    var label = x.type === 'admin' ? '管理员' : (x.type === 'museum' ? '馆藏单位' : '检测机构');
+    var cls = x.type === 'admin' ? 'bg-purple' : (x.type === 'museum' ? 'bg-blue' : 'bg-green');
+    return '<div class="item"><div class="t">' + esc(x.org) + ' <span class="badge ' + cls + '">' + label + '</span></div>' +
+      '<div class="d">账号 ' + esc(x.user) + ' · ' + (x.pass ? ('密码 ' + esc(x.pass) + '（本机模式明文）') : '密码已加密存储（服务端）') + '</div>' +
+      '<button class="btn-gray" style="margin-top:6px" onclick="delAccount(\'' + x.id + '\')">删除</button></div>';
+  }).join('');
+}
+
+/* ================= 登录 / 导航 ================= */
+function showScreen(s){
+  document.getElementById('screen-login').classList.toggle('hidden', s !== 'login');
+  document.getElementById('screen-app').classList.toggle('hidden', s !== 'app');
+}
+function login(key){
+  if (key === 'public'){ enterApp(null); return; }
+  pendingRole = key;
+  document.getElementById('liErr').style.display = 'none';
+  document.getElementById('credPanel').classList.remove('hidden');
+  document.getElementById('liUser').value = '';
+  document.getElementById('liPass').value = '';
+}
+function doLogin(){
+  var u = document.getElementById('liUser').value.trim();
+  var p = document.getElementById('liPass').value;
+  if (API){
+    apiPost('/api/login', { user: u, pass: p }).then(function(r){
+      if (!r || !r.ok){
+        var e = document.getElementById('liErr');
+        e.textContent = (r && r.msg) ? r.msg : '账号或密码错误';
+        e.style.display = 'block';
+        return;
+      }
+      enterApp({ user: (u || 'guest'), serverRole: r.role });
+    });
+    return;
+  }
+  var acc = null;
+  ACCOUNTS.forEach(function(x){ if (x.user === u && x.pass === p && x.type === pendingRole) acc = x; });
+  if (!acc){
+    var e = document.getElementById('liErr');
+    e.textContent = '账号或密码错误（演示账号见下方提示）';
+    e.style.display = 'block';
+    return;
+  }
+  enterApp(acc);
+}
+function togglePass(){
+  var inp = document.getElementById('liPass');
+  var btn = document.getElementById('passBtn');
+  if (inp.type === 'password'){ inp.type = 'text'; btn.textContent = '🙈 隐藏密码'; }
+  else { inp.type = 'password'; btn.textContent = '👁 显示密码'; }
+}
+function cancelLogin(){
+  pendingRole = null;
+  document.getElementById('credPanel').classList.add('hidden');
+}
+function enterApp(acc){
+  LOGINED = acc;
+  ROLE = acc ? (acc.serverRole || Object.assign({}, ROLES[acc.type], { org: acc.org })) : ROLES.public;
+  if (!API){ audit(ROLE.name + ' · ' + ROLE.org, '登录', acc ? ('账号 ' + acc.user + ' 登录成功') : '游客进入'); }
+  save();
+  showScreen('app');
+  document.getElementById('roleBadge').textContent = ROLE.name + ' · ' + ROLE.org + (acc ? ' · ' + acc.user : '');
+  buildNav();
+  showTab('home');
+  renderAll();
+}
+function logout(){ if (ROLE) audit(ROLE.name + ' · ' + ROLE.org, '退出', '退出平台'); ROLE = null; LOGINED = null; save(); showScreen('login'); }
+function navKey(){
+  if (!ROLE) return 'pub';
+  if (ROLE.isAdmin) return 'admin';
+  if (ROLE.perm && ROLE.perm.reg) return 'staff';
+  if (ROLE.perm && ROLE.perm.event) return 'exam';
+  return 'pub';
+}
+function buildNav(){
+  var items = NAV[navKey()];
+  var box = document.getElementById('bottomnav');
+  box.innerHTML = '';
+  items.forEach(function(it){
+    var b = document.createElement('button');
+    b.setAttribute('data-tab', it[0]);
+    b.innerHTML = '<span class="ic">' + it[2] + '</span>' + it[1];
+    b.onclick = function(){ showTab(it[0]); };
+    box.appendChild(b);
+  });
+}
+function showTab(t){
+  var items = NAV[navKey()];
+  var ids = items.map(function(x){ return x[0]; });
+  if (ids.indexOf(t) < 0) t = 'home';
+  if (t === 'admin' && (!ROLE || !ROLE.isAdmin)) t = 'home';
+  ids.forEach(function(id){ document.getElementById('tab-' + id).classList.toggle('active', id === t); });
+  document.querySelectorAll('#bottomnav button').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-tab') === t);
+  });
+  if (t !== 'scan'){ stopScan(); }
+  if (t === 'chain'){ renderNodes(); }
+  if (t === 'reg'){ renderArtifactSelects(); renderRegList(); document.getElementById('fOrg').value = ROLE.org; }
+  if (t === 'trace'){ renderArtifactSelects(); renderEventList(); }
+  if (t === 'lic'){ renderArtifactSelects(); renderLicList(); }
+  if (t === 'verify'){ renderVerifySelect(); }
+  if (t === 'scan'){ renderScan(); }
+  if (t === 'admin'){ renderAdmin(); }
+  if (t === 'me'){ renderMe(); }
+  if (t === 'home'){ renderHome(); }
+  window.scrollTo(0, 0);
+}
+
+/* ================= 渲染 ================= */
+function renderAll(){
+  renderStats();
+  renderHome();
+  renderArtifactSelects();
+  renderRegList();
+  renderEventList();
+  renderLicList();
+  renderChainTab();
+  renderVerifySelect();
+  renderMe();
+}
+function countBy(type){ var n = 0; CHAIN.forEach(function(b){ if (b.data.type === type) n++; }); return n; }
+function renderStats(){
+  var h = document.getElementById('stats');
+  h.innerHTML =
+    '<div class="stat-card"><div class="v">' + (CHAIN.length - 1) + '</div><div class="k">区块高度</div></div>' +
+    '<div class="stat-card"><div class="v">' + ARTIFACTS.length + '</div><div class="k">已登记文物</div></div>' +
+    '<div class="stat-card"><div class="v">' + countBy('EVENT') + '</div><div class="k">溯源事件</div></div>' +
+    '<div class="stat-card"><div class="v">' + countBy('LICENSE') + '</div><div class="k">授权记录</div></div>';
+}
+function blockItemHtml(b){
+  var badge = TYPE_BADGE[b.data.type] || ['数据','bg-blue'];
+  var title = '';
+  if (b.data.type === 'REGISTER') title = b.data.name + (b.data.photoHash ? ' 📷' : '') + '（' + b.data.artifactId + '）';
+  else if (b.data.type === 'EVENT') title = b.data.name + ' · ' + b.data.eventType + (b.data.evidenceHash ? ' 📷' : '');
+  else if (b.data.type === 'LICENSE') title = b.data.name + ' → ' + b.data.grantee;
+  else title = b.data.content;
+  return '<div class="item"><div class="t">#' + b.index + ' ' + title + '<span class="badge ' + badge[1] + '">' + badge[0] + '</span></div>' +
+    '<div class="d">' + esc(b.data.content || '') + '</div>' +
+    '<div class="d">' + esc(b.data.org || '') + ' · ' + fmtTime(b.time) + ' · 确认 ' + (b.conf || 4) + '/4</div></div>';
+}
+function renderHome(){
+  var q = document.getElementById('quickBtns');
+  var p = ROLE.perm || {};
+  var btns = (p.reg ? '<button onclick="showTab(\'reg\')">📝 登记文物</button>' : '') +
+             (p.event ? '<button onclick="showTab(\'trace\')">🧾 记溯源</button>' : '') +
+             (p.lic ? '<button onclick="showTab(\'lic\')">📜 发授权</button>' : '');
+  if (!btns) btns = '<button onclick="showTab(\'verify\')">🔍 验证真伪</button><button onclick="showTab(\'chain\')">⛓️ 看链</button>';
+  btns += '<button onclick="showTab(\'scan\')">📷 扫码核验</button>';
+  q.innerHTML = btns;
+  document.getElementById('homeChainHint').textContent = CHAIN.length;
+  var box = document.getElementById('homeBlocks');
+  var last = CHAIN.slice(-3).reverse();
+  box.innerHTML = last.map(blockItemHtml).join('') || '<div class="item"><div class="d">暂无区块</div></div>';
+}
+function renderArtifactSelects(){
+  var opts = ARTIFACTS.map(function(a){ return '<option value="' + esc(a.code) + '">' + esc(a.name) + '（' + esc(a.code) + '）</option>'; }).join('');
+  ['eArtifactSel','lArtifactSel','vArtifactSel'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = opts || '<option value="">— 暂无文物，请先登记 —</option>';
+  });
+}
+function renderRegList(){
+  var list = ARTIFACTS.map(function(a){
+    return '<div class="item"><div class="t">' + esc(a.name) + '<span class="badge bg-blue">' + esc(a.level) + '</span>' + (a.photoHash ? ' <span class="badge bg-green">📷 取证</span>' : '') + '</div>' +
+      '<div class="d">' + esc(a.code) + ' · ' + esc(a.dynasty) + ' · ' + esc(a.material) + ' · ' + esc(a.org) + '</div></div>';
+  }).join('');
+  document.getElementById('regList').innerHTML = list || '<div class="item"><div class="d">暂无登记，去上面登记第一件文物吧。</div></div>';
+}
+function renderEventList(){
+  var list = CHAIN.filter(function(b){ return b.data.type === 'EVENT'; }).slice(-8).reverse().map(blockItemHtml).join('');
+  document.getElementById('eventList').innerHTML = list || '<div class="item"><div class="d">暂无事件。</div></div>';
+}
+function renderLicList(){
+  var list = CHAIN.filter(function(b){ return b.data.type === 'LICENSE'; }).slice(-8).reverse().map(blockItemHtml).join('');
+  document.getElementById('licList').innerHTML = list || '<div class="item"><div class="d">暂无授权。</div></div>';
+}
+function copyHashIdx(i){
+  if (CHAIN[i] && CHAIN[i].hash) copyHash(CHAIN[i].hash);
+}
+function copyHash(h){
+  function fallback(){
+    var ta = document.createElement('textarea');
+    ta.value = h;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    var ok = false;
+    try{ ok = document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+    toast(ok ? '✅ 哈希已复制' : '复制失败，请手动选择');
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(h).then(function(){ toast('✅ 哈希已复制'); }, fallback);
+  } else { fallback(); }
+}
+function renderChainTab(){
+  var box = document.getElementById('chainList');
+  box.innerHTML = CHAIN.slice().reverse().map(function(b){
+    var badge = TYPE_BADGE[b.data.type] || ['数据','bg-blue'];
+    var cls = 'blk' + (b.bad ? ' bad' : ' ok');
+    var title = '';
+    if (b.data.type === 'REGISTER') title = '文物登记 · ' + b.data.name + (b.data.photoHash ? ' 📷' : '');
+    else if (b.data.type === 'EVENT') title = '溯源事件 · ' + b.data.name + (b.data.evidenceHash ? ' 📷' : '');
+    else if (b.data.type === 'LICENSE') title = '授权 · ' + b.data.name;
+    else title = '创世区块';
+    return '<div class="' + cls + '">' +
+      '<div class="no">#' + b.index + ' ' + title + ' <span class="badge ' + badge[1] + '">' + badge[0] + '</span> ' + (b.bad ? '❌' : '✅') + ' <button class="btn-gray" style="padding:2px 8px;font-size:11px;margin-left:4px" onclick="copyHashIdx(' + b.index + ')">📋 复制</button></div>' +
+      '<div class="d" style="font-size:12px;color:var(--muted)">' + esc(b.data.content || '') + ' · ' + esc(b.data.org || '') + ' · ' + fmtTime(b.time) + ' · 确认 ' + (b.conf || 4) + '/4 · nonce ' + b.nonce + ' · 难度 ' + b.diff + '</div>' +
+      '<div class="hr">前块哈希</div><div class="hash">' + short(b.prevHash) + '</div>' +
+      '<div class="hr">本块哈希</div><div class="hash">' + short(b.hash) + '</div>' +
+      '</div>';
+  }).join('');
+}
+function renderNodes(){
+  var box = document.getElementById('nodes');
+  box.innerHTML = NODES.map(function(n, i){
+    var bad = (nodeAttacked && i === 2);
+    return '<div class="node-card' + (bad ? ' bad' : '') + '"><div class="nd">' + n + '</div><div class="ns">' + (bad ? '❌ 数据被篡改，已隔离' : '✅ 同步正常 · 区块 ' + (CHAIN.length - 1)) + '</div></div>';
+  }).join('');
+}
+function renderVerifySelect(){
+  var el = document.getElementById('vArtifactSel');
+  if (!el) return;
+  var prev = el.value;
+  var opts = ARTIFACTS.map(function(a){ return '<option value="' + esc(a.code) + '">' + esc(a.name) + '（' + esc(a.code) + '）</option>'; }).join('');
+  el.innerHTML = opts || '<option value="">—</option>';
+  if (prev && artifactOf(prev)) el.value = prev;
+  showVerifyFp();
+}
+function showVerifyFp(){
+  var el = document.getElementById('vArtifactSel');
+  var a = artifactOf(el.value);
+  document.getElementById('vFp').textContent = a ? ('0x' + a.fp) : '—';
+  var r = document.getElementById('vResult');
+  r.className = 'vres'; r.innerHTML = '';
+  var reg = null;
+  if (a){ CHAIN.forEach(function(b){ if (b.data.type === 'REGISTER' && b.data.artifactId === a.code) reg = b; }); }
+  var payload = (a && reg) ? ('RC:' + a.code + ':' + reg.index) : '—';
+  var qrText = document.getElementById('vQrText');
+  var qrBox = document.getElementById('vQrBox');
+  if (qrText) qrText.textContent = payload;
+  if (qrBox) qrBox.innerHTML = (a && reg) ? pseudoQrSvg(payload) : '';
+}
+function renderMe(){
+  var el = document.getElementById('meInfo');
+  el.innerHTML = '<div class="item"><div class="t">' + ROLE.name + ' · ' + ROLE.org + '</div>' +
+    '<div class="d">' + capabilityText() + '</div>' +
+    '<div class="d">登录账号：' + (LOGINED ? LOGINED.user : '游客（免登录）') + '</div></div>';
+  document.getElementById('diffSel').value = String(DIFF);
+}
+/* ================= 业务操作 ================= */
+var pendingPhoto = null;
+function sha256Bytes(buf){
+  if (!window.crypto || !window.crypto.subtle) return Promise.resolve(null);
+  return crypto.subtle.digest('SHA-256', buf).then(buf2hex);
+}
+function onPhotoPicked(inp){
+  var f = inp.files[0];
+  if (!f) return;
+  f.arrayBuffer().then(function(buf){
+    sha256Bytes(buf).then(function(h){
+      if (!h){ toast('浏览器不支持，请用 Chrome/Edge'); return; }
+      pendingPhoto = { hash: h, name: f.name };
+      var info = document.getElementById('fPhotoInfo');
+      info.textContent = '已取证：' + f.name + ' · 指纹 0x' + h.slice(0, 12) + '…';
+      info.style.color = '#059669';
+      var url = URL.createObjectURL(f);
+      document.getElementById('fPhotoPreview').innerHTML = '<img class="thumb" src="' + url + '">';
+      toast('📸 取证完成，照片指纹将随登记写入链上');
+    });
+  });
+}
+function resetPhoto(){
+  pendingPhoto = null;
+  var info = document.getElementById('fPhotoInfo');
+  info.textContent = '未取证';
+  info.style.color = '';
+  document.getElementById('fPhotoPreview').innerHTML = '';
+  document.getElementById('fPhoto').value = '';
+}
+async function submitRegister(){
+  var name = document.getElementById('fName').value.trim();
+  var code = document.getElementById('fCode').value.trim();
+  if (!name || !code){ toast('请至少填写文物名称和馆藏编号'); return; }
+  if (artifactOf(code)){ toast('该馆藏编号已登记过，换一个编号'); return; }
+  var a = { name:name, code:code, dynasty:document.getElementById('fDynasty').value.trim() || '—',
+            material:document.getElementById('fMaterial').value.trim() || '—',
+            level:document.getElementById('fLevel').value,
+            desc:document.getElementById('fDesc').value.trim() || '',
+            org:ROLE.org, time:Date.now() };
+  if (pendingPhoto){ a.photoHash = pendingPhoto.hash; a.photoName = pendingPhoto.name; }
+  a.fp = await sha256Hex(canonicalArtifact(a));
+  document.getElementById('btnReg').disabled = true;
+  var b = await addBlock({type:'REGISTER', artifactId:a.code, name:a.name, level:a.level, fingerprint:a.fp, photoHash:a.photoHash || '', org:ROLE.org});
+  document.getElementById('btnReg').disabled = false;
+  if (!b){ toast('❌ 上链失败，请重试'); return; }
+  ARTIFACTS.push(a);
+  save();
+  if (API){ apiPost('/api/artifact', { artifact: a }); }
+  document.getElementById('fName').value = ''; document.getElementById('fCode').value = '';
+  document.getElementById('fDynasty').value = ''; document.getElementById('fMaterial').value = '';
+  document.getElementById('fDesc').value = '';
+  resetPhoto();
+  toast('✅ 已上链！区块 #' + b.index + '（nonce ' + b.nonce + ' 次挖矿，4/4 节点确认）');
+  audit(ROLE.org, '文物登记', name + '（' + code + '）上链，区块 #' + b.index);
+  renderAll();
+}
+var pendingEventPhoto = null;
+function onEventPhotoPicked(inp){
+  var f = inp.files[0];
+  if (!f) return;
+  f.arrayBuffer().then(function(buf){
+    sha256Bytes(buf).then(function(h){
+      if (!h) return;
+      pendingEventPhoto = { hash: h, name: f.name };
+      var info = document.getElementById('ePhotoInfo');
+      info.textContent = '已取证：' + f.name + ' · 指纹 0x' + h.slice(0, 12) + '…';
+      info.style.color = '#059669';
+      var url = URL.createObjectURL(f);
+      document.getElementById('ePhotoPreview').innerHTML = '<img class="thumb" src="' + url + '">';
+      toast('📸 证据取证完成，指纹将随事件上链');
+    });
+  });
+}
+function resetEventPhoto(){
+  pendingEventPhoto = null;
+  var info = document.getElementById('ePhotoInfo');
+  info.textContent = '未取证'; info.style.color = '';
+  document.getElementById('ePhotoPreview').innerHTML = '';
+  document.getElementById('ePhoto').value = '';
+}
+async function submitEvent(){
+  var code = document.getElementById('eArtifactSel').value;
+  var note = document.getElementById('eNote').value.trim();
+  if (!code){ toast('请先选择文物（还没有文物？先去「登记」）'); return; }
+  if (!note){ toast('请填写事件内容'); return; }
+  var a = artifactOf(code);
+  var type = document.getElementById('eType').value;
+  var b = await addBlock({type:'EVENT', artifactId:a.code, name:a.name, eventType:type, content:note, evidenceHash:pendingEventPhoto ? pendingEventPhoto.hash : '', org:ROLE.org});
+  if (!b){ toast('❌ 上链失败'); return; }
+  document.getElementById('eNote').value = '';
+  resetEventPhoto();
+  toast('✅ 事件已上链！区块 #' + b.index + '（4/4 节点确认）');
+  audit(ROLE.org, '溯源事件', note + '（' + code + '），区块 #' + b.index);
+  renderAll();
+}
+async function submitLicense(){
+  var code = document.getElementById('lArtifactSel').value;
+  var grantee = document.getElementById('lGrantee').value.trim();
+  var scope = document.getElementById('lScope').value.trim();
+  var term = document.getElementById('lTerm').value.trim() || '—';
+  if (!code){ toast('请先选择文物'); return; }
+  if (!grantee || !scope){ toast('请填写被授权方和授权用途'); return; }
+  var a = artifactOf(code);
+  var b = await addBlock({type:'LICENSE', artifactId:a.code, name:a.name, grantee:grantee, scope:scope, term:term, content:'授权「' + grantee + '」用于：' + scope + '（期限：' + term + '）', org:ROLE.org});
+  if (!b){ toast('❌ 上链失败'); return; }
+  document.getElementById('lGrantee').value = ''; document.getElementById('lScope').value = '';
+  document.getElementById('lTerm').value = '';
+  toast('✅ 授权已上链！区块 #' + b.index + '（4/4 节点确认）');
+  audit(ROLE.org, '数字授权', grantee + ' · ' + scope + '，区块 #' + b.index);
+  renderAll();
+}
+
+/* ================= 验证 ================= */
+document.getElementById('batchInput').addEventListener('change', function(ev){
+  var files = Array.prototype.slice.call(ev.target.files);
+  var box = document.getElementById('batchResult');
+  if (!files.length) return;
+  box.innerHTML = '<div class="item"><div class="d">⏳ 正在核验 ' + files.length + ' 个文件…</div></div>';
+  var rows = [];
+  var okCount = 0;
+  var jobs = files.map(function(f){
+    return f.text().then(function(text){
+      return sha256Hex(text.replace(/\r\n/g, '\n')).then(function(h){
+        var hit = null;
+        ARTIFACTS.forEach(function(a){ if (a.fp === h) hit = a; });
+        var verdict, cls;
+        if (hit){ verdict = '✅ 官方原版 · ' + hit.name + '（' + hit.code + '）'; cls = 'ok'; okCount++; }
+        else { verdict = '❌ 被篡改或未登记'; cls = 'bad'; }
+        rows.push('<div class="brow ' + cls + '"><b>' + f.name + '</b> → ' + verdict + '</div>');
+      });
+    });
+  });
+  Promise.all(jobs).then(function(){
+    box.innerHTML = '<div class="statusline ' + (okCount === files.length ? 'ok' : 'bad') + '" style="margin:8px 0 4px">共 ' + files.length + ' 个文件：' + okCount + ' 个通过 · ' + (files.length - okCount) + ' 个未通过</div>' + rows.join('');
+    audit(ROLE ? ROLE.name : '游客', '批量核验', files.length + ' 个文件，' + okCount + ' 通过');
+    ev.target.value = '';
+  });
+});
+function downloadFile(kind){
+  var el = document.getElementById('vArtifactSel');
+  var a = artifactOf(el.value);
+  if (!a){ toast('请先选择文物'); return; }
+  var content = canonicalArtifact(a);
+  if (kind === 'tamper') content = content + '\n【此处被篡改】';
+  var blob = new Blob([content], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  link.href = url;
+  link.download = (kind === 'tamper' ? a.code + '-被篡改示例.json' : a.code + '-档案.json');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+document.getElementById('vArtifactSel').addEventListener('change', showVerifyFp);
+document.getElementById('vUpload').addEventListener('change', function(ev){
+  var f = ev.target.files[0];
+  if (!f) return;
+  f.text().then(function(text){
+    sha256Hex(text.replace(/\r\n/g, '\n')).then(function(fileHash){
+      var a = artifactOf(document.getElementById('vArtifactSel').value);
+      var line1 = '<div>文件哈希：0x' + fileHash + '</div>';
+      var line2 = '<div>链上指纹：0x' + a.fp + '</div>';
+      var r = document.getElementById('vResult');
+      if (!a){ r.className = 'vres bad'; r.innerHTML = '❌ 请先选择文物。'; return; }
+      if (fileHash === a.fp){
+        r.className = 'vres ok';
+        r.innerHTML = '<b>✅ 官方原版</b>：文件与链上登记指纹一致，可信、未被篡改。' + line1 + line2;
+      } else {
+        var other = null;
+        ARTIFACTS.forEach(function(x){ if (x.fp === fileHash) other = x; });
+        if (other){
+          r.className = 'vres warn';
+          r.innerHTML = '<b>⚠ 文件属于另一件文物</b>：「' + esc(other.name) + '」。请确认对应关系。' + line1 + line2;
+        } else {
+          r.className = 'vres bad';
+          r.innerHTML = '<b>❌ 被篡改或未登记</b>：与链上指纹不符——任何 1 字节改动都会这样。' + line1 + line2;
+        }
+      }
+      audit(ROLE ? ROLE.name : '游客', '文件验证', '对 ' + a.code + ' 的验证完成');
+      ev.target.value = '';
+    });
+  });
+});
+
+/* ================= 链校验 / 节点演示 ================= */
+async function runValidate(){
+  var okAll = true;
+  setMine('🔍 正在逐块重算哈希并校验链接…');
+  await sleep(50);
+  for (var i = 0; i < CHAIN.length; i++){
+    var b = CHAIN[i];
+    var h = await sha256Hex(blockStr(b));
+    var okHash = (h !== null && h === b.hash);
+    var okLink = (i === 0) ? true : (b.prevHash === CHAIN[i-1].hash);
+    b.bad = !(okHash && okLink);
+    if (b.bad) okAll = false;
+  }
+  setMine('');
+  save();
+  renderChainTab();
+  var s = document.getElementById('chainStatus');
+  if (okAll){
+    s.className = 'statusline ok';
+    s.textContent = '✅ 整条链有效：' + CHAIN.length + ' 个区块全部校验通过（哈希正确 + 环环相扣）。';
+  } else {
+    s.className = 'statusline bad';
+    s.textContent = '❌ 发现 ' + CHAIN.filter(function(b){return b.bad;}).length + ' 个区块校验失败：数据被动过。这就是区块链的自我体检能力。';
+  }
+}
+function nodeAttack(){
+  nodeAttacked = !nodeAttacked;
+  renderNodes();
+  var s = document.getElementById('chainStatus');
+  var btn = document.getElementById('btnNodeAttack');
+  if (nodeAttacked){
+    s.className = 'statusline ok';
+    s.textContent = '⚠ 节点3（公证机构）的数据被"坏人"篡改了——其余 3 个节点一致，篡改节点被自动隔离，整条链不受影响。这就是"多数共识"。点按钮可恢复。';
+    btn.textContent = '↩ 恢复被攻击的节点';
+  } else {
+    s.className = 'statusline ok';
+    s.textContent = '✅ 4 个节点全部同步正常。';
+    btn.textContent = '⚠ 模拟 1 个节点被篡改';
+  }
+  audit(ROLE.org, '共识演示', '节点篡改模拟' + (nodeAttacked ? '触发' : '恢复'));
+}
+
+/* ================= 初始化 ================= */
+async function init(){
+  if (API){
+    try{
+      var st = await apiGet('/api/state');
+      if (st && st.chain && st.chain.length){
+        CHAIN = st.chain; ARTIFACTS = st.artifacts || []; ORGS = st.orgs || [];
+        AUDIT = st.audit || []; ACCOUNTS = st.accounts || []; DIFF = st.diff || 2;
+        var nb = document.getElementById('netBadge');
+        if (nb) nb.textContent = '● 服务端在线 · 多人共享数据';
+        var lm = document.getElementById('loginMode');
+        if (lm) lm.textContent = '● 服务端模式 · 登录后数据全网共享';
+        ROLE = null;
+        showScreen('login');
+        toast('✅ 已连接服务端，数据全网共享');
+        return;
+      }
+    }catch(e){}
+    API = false;
+    var nb2 = document.getElementById('netBadge');
+    if (nb2) nb2.textContent = '本机模式 · 数据仅本机（未连接服务端）';
+    var lm2 = document.getElementById('loginMode');
+    if (lm2) lm2.textContent = '本机模式 · 数据仅存本浏览器';
+  }
+  var had = load();
+  if (!ACCOUNTS.length){
+    ACCOUNTS = [
+      { id:'A1', user:'museum', pass:'123456', org:'绵阳市博物馆', type:'museum' },
+      { id:'A2', user:'exam', pass:'123456', org:'文物检测中心', type:'exam' },
+      { id:'A3', user:'admin', pass:'admin888', org:'平台运营方', type:'admin' }
+    ];
+    save();
+  }
+  if (!had){
+    setMine('⏳ 首次运行：正在生成本平台的区块链（创世区块 + 示例数据）…');
+    await seedChain();
+    setMine('');
+  }
+  showScreen(ROLE ? 'app' : 'login');
+  if (ROLE){
+    document.getElementById('roleBadge').textContent = ROLE.name + ' · ' + ROLE.org;
+    buildNav();
+    showTab('home');
+    renderAll();
+    runValidate();
+  } else {
+    document.getElementById('diffSel').value = String(DIFF);
+  }
+}
+window.addEventListener('DOMContentLoaded', init);
+if (location.protocol.indexOf('http') === 0 && 'serviceWorker' in navigator){
+  window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+}
+if (API){
+  setInterval(function(){
+    apiGet('/api/state').then(function(st){
+      if (st && st.chain && st.chain.length > CHAIN.length){
+        CHAIN = st.chain; ARTIFACTS = st.artifacts || []; AUDIT = st.audit || [];
+        ORGS = st.orgs || []; ACCOUNTS = st.accounts || []; DIFF = st.diff || 2;
+        renderAll();
+        toast('↻ 已同步其他设备的新数据');
+      }
+    });
+  }, 15000);
+}
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,562 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文博链 RelicChain · 可视化总览</title>
+<style>
+:root{--blue:#1a5fb4;--blue2:#2b7fd4;--green:#26a269;--teal:#0e8a7a;--orange:#e66100;--purple:#813d9c;--red:#c01c28;--ink:#1c2430;--muted:#5e6c84;--bg:#eef1f6;--card:#ffffff;--line:#d7dde6;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei","PingFang SC","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+header{background:linear-gradient(120deg,#123a6b,#1a5fb4 55%,#2b7fd4);color:#fff;padding:26px 32px 18px}
+header h1{font-size:26px;letter-spacing:1px}
+header .sub{margin-top:6px;opacity:.88;font-size:14px}
+.stats{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);border-radius:10px;padding:5px 14px;font-size:13px}
+nav.tabs{display:flex;gap:8px;padding:16px 32px 0;flex-wrap:wrap}
+.tab-btn{background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:10px 10px 0 0;padding:9px 16px;font-size:14px;cursor:pointer;border-bottom:none}
+.tab-btn.active{color:var(--blue);font-weight:700;border-color:var(--blue);background:#fff;box-shadow:inset 0 3px 0 var(--blue)}
+main{padding:16px 32px 40px}
+.tab{display:none}
+.tab.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 1px 4px rgba(16,24,40,.06)}
+.card h2{font-size:18px;margin-bottom:10px;color:var(--ink)}
+.card h2 .tag{font-size:12px;font-weight:400;color:var(--muted);margin-left:8px}
+.hint{background:#fff8e6;border:1px solid #f0dca0;color:#7a5c00;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:14px}
+.hint b{color:#5c4400}
+.diagram{width:100%;height:auto;display:block}
+.svg-wrap{overflow-x:auto}
+.zone{fill:#fbfcfe;stroke-width:2}
+.zA{stroke:var(--blue)} .zB{stroke:var(--green)} .zC{stroke:var(--orange)}
+.zt{font-size:15px;font-weight:700}
+.ztA{fill:var(--blue)} .ztB{fill:var(--green)} .ztC{fill:var(--orange)}
+.nb{stroke-width:1.5;cursor:pointer;transition:stroke-width .15s}
+.nb.d{fill:#e8f1fb;stroke:var(--blue)}
+.nb.g{fill:#e6f6ee;stroke:var(--green)}
+.nb.o{fill:#fdeee0;stroke:var(--orange)}
+.nb.r{fill:#fbe9ea;stroke:var(--red)}
+.node{cursor:pointer}
+.node.sel .nb{stroke-width:3.5}
+.nt{font-size:13.5px;font-weight:700;fill:#1c2430}
+.ns{font-size:10.5px;fill:#5e6c84}
+.lab{font-size:10.5px;fill:#5e6c84}
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:12.5px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:12px;height:12px;border-radius:3px;display:inline-block}
+.info{margin-top:6px;border-left:4px solid var(--blue)}
+.info h3{font-size:16px;margin-bottom:6px;color:var(--blue)}
+.info p{font-size:14px;color:#333}
+.flow-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.flow-card .flow-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.flow-card .flow-name{font-weight:700;font-size:15px}
+.flow-prog{font-size:12.5px;color:var(--muted)}
+.step{display:flex;gap:10px;align-items:center;padding:7px 10px;border-radius:8px;background:#f4f7fb;border:1px solid var(--line);margin-bottom:7px;font-size:13px;transition:.25s}
+.step .num{width:22px;height:22px;border-radius:50%;background:#cfd8e3;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+.step.on{background:#e8f1fb;border-color:var(--blue)}
+.step.on .num{background:var(--blue)}
+.step.done{background:#eefaf3}
+.step.done .num{background:var(--green)}
+.flow-controls{display:flex;gap:8px;margin-top:12px}
+.flow-controls button{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;color:var(--ink)}
+.flow-controls button:hover{border-color:var(--blue);color:var(--blue)}
+.layer{display:flex;align-items:stretch;border:1px solid var(--line);border-left:6px solid var(--lc);border-radius:10px;background:#fff;margin-bottom:10px;cursor:pointer;overflow:hidden}
+.layer .ln{width:150px;flex:none;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;background:#f4f7fb}
+.layer .lc{flex:1;padding:10px 14px;font-size:13px;color:var(--muted);display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.chip{background:#eef1f6;border:1px solid var(--line);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--ink)}
+.layer-desc{display:none;background:#f7fafd;border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-size:13.5px;margin:-4px 0 12px;color:#333}
+.layer-desc.show{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left}
+th{background:#f4f7fb;color:var(--ink)}
+.tl{display:flex;gap:12px;overflow-x:auto;padding:6px 2px 10px}
+.tl-item{min-width:190px;flex:1;border:1px solid var(--line);border-top:5px solid var(--tc);border-radius:12px;padding:14px;background:#fff}
+.tl-item .mid{font-weight:700;font-size:15px;color:var(--tc)}
+.tl-item .time{font-size:12px;color:var(--muted);margin:4px 0 8px}
+.tl-item ul{padding-left:18px;font-size:13px;color:#333}
+.inout{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.inbox{border:1px solid #bfe3cd;background:#f2fbf6;border-radius:10px;padding:12px 16px}
+.outbox{border:1px solid #f0c8cb;background:#fdf3f4;border-radius:10px;padding:12px 16px}
+.inbox h4{color:var(--green)} .outbox h4{color:var(--red)}
+.inbox li,.outbox li{font-size:13px;margin-left:16px}
+.qcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;background:#fff}
+.qcard .q{font-weight:700;margin-bottom:10px;font-size:15px}
+.opts{display:flex;gap:10px;flex-wrap:wrap}
+.opt{border:1.5px solid var(--line);border-radius:10px;padding:8px 14px;font-size:13.5px;cursor:pointer;background:#fff;position:relative;user-select:none}
+.opt:hover{border-color:var(--blue2)}
+.opt.sel{border-color:var(--blue);background:#e8f1fb;font-weight:600}
+.rec{position:absolute;top:-9px;right:-6px;background:var(--green);color:#fff;font-size:10px;border-radius:8px;padding:1px 7px}
+.decbar{margin-top:8px;font-size:13.5px;color:var(--muted)}
+footer{padding:16px 32px 30px;color:var(--muted);font-size:12.5px}
+@media(max-width:900px){.flow-grid,.grid2,.inout{grid-template-columns:1fr}}
+/* ===== 统一主题美化 ===== */
+body{background:linear-gradient(180deg,#e7edf8,#f4f7fb)}
+.card{border-radius:16px;border-color:#e2e8f0;box-shadow:0 2px 12px rgba(15,23,42,.06)}
+header{background:linear-gradient(120deg,#0b1f4b,#1d4ed8 55%,#3b82f6);box-shadow:0 8px 24px rgba(29,78,216,.22)}
+.btn:hover,.flow-controls button:hover{background:#eff6ff}
+.tab-btn.active{color:#1d4ed8;border-color:#1d4ed8}
+html{scroll-behavior:smooth}
+.totop{position:fixed;right:26px;bottom:26px;z-index:60;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border:none;border-radius:50%;width:48px;height:48px;font-size:18px;cursor:pointer;box-shadow:0 8px 20px rgba(29,78,216,.4);opacity:0;pointer-events:none;transition:all .25s}
+.totop.show{opacity:1;pointer-events:auto}
+.totop:hover{transform:translateY(-3px)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>文博链 RelicChain · 可视化总览</h1>
+  <div class="sub">传统文物数字化 · 区块链可信底座 —— 一图看懂：数据怎么上链、事件怎么溯源、公众怎么验证</div>
+  <div class="stats">
+    <span class="stat">6 大痛点 → 6 大对策</span>
+    <span class="stat">4 条核心业务流程</span>
+    <span class="stat">6 份智能合约</span>
+    <span class="stat">数据分级 L0–L3</span>
+    <span class="stat">M0–M4 五阶段路线</span>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="overview" onclick="showTab('overview')">① 一图看懂</button>
+  <button class="tab-btn" data-tab="flows" onclick="showTab('flows')">② 业务流程</button>
+  <button class="tab-btn" data-tab="arch" onclick="showTab('arch')">③ 系统架构</button>
+  <button class="tab-btn" data-tab="data" onclick="showTab('data')">④ 数据模型</button>
+  <button class="tab-btn" data-tab="roadmap" onclick="showTab('roadmap')">⑤ 路线图</button>
+  <button class="tab-btn" data-tab="decisions" onclick="showTab('decisions')">⑥ 决策清单</button>
+</nav>
+
+<main>
+
+<!-- ============ 一图看懂 ============ -->
+<section id="tab-overview" class="tab active">
+  <div class="card">
+    <h2>核心逻辑一张图 <span class="tag">点击任意节点查看说明 · 从①到③横向读：数据 → 上链 → 应用</span></h2>
+    <div class="hint"><b>30 秒看懂：</b>文物经扫描采集变成<b>数字孪生</b>（①数据层）→ 只把<b>文件指纹（哈希）</b>写到区块链（②信任层）→ 机构签名<b>写入</b>登记/溯源/授权，公众只读<b>验证</b>（③应用层）。文件本体在链下，链上只有不可篡改的"指纹 + 事实"。</div>
+    <div class="svg-wrap">
+      <svg viewBox="0 0 1240 660" id="ovSvg" class="diagram">
+        <defs>
+          <marker id="mArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b9bb4"/></marker>
+          <marker id="mArrD" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b6c2d4"/></marker>
+          <marker id="mArrG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#26a269"/></marker>
+        </defs>
+
+        <rect x="20" y="64" width="380" height="560" rx="14" class="zone zA"/>
+        <text x="210" y="92" text-anchor="middle" class="zt ztA">① 数据层 · 数字化成果（链下）</text>
+        <rect x="440" y="64" width="380" height="560" rx="14" class="zone zB"/>
+        <text x="630" y="92" text-anchor="middle" class="zt ztB">② 信任层 · 区块链（链上）</text>
+        <rect x="860" y="64" width="360" height="560" rx="14" class="zone zC"/>
+        <text x="1040" y="92" text-anchor="middle" class="zt ztC">③ 应用层 · 机构与公众</text>
+
+        <g class="node" data-id="relic"><rect x="80" y="112" width="260" height="54" rx="10" class="nb d"/><text x="210" y="135" text-anchor="middle" class="nt">实物文物 Relic</text><text x="210" y="153" text-anchor="middle" class="ns">馆藏编号唯一 · 数字化对象</text></g>
+        <g class="node" data-id="collect"><rect x="80" y="198" width="260" height="54" rx="10" class="nb d"/><text x="210" y="221" text-anchor="middle" class="nt">数字化采集</text><text x="210" y="239" text-anchor="middle" class="ns">三维扫描 · 摄影测量 · 光谱检测</text></g>
+        <g class="node" data-id="twin"><rect x="80" y="284" width="260" height="54" rx="10" class="nb d"/><text x="210" y="307" text-anchor="middle" class="nt">数字孪生 Twin</text><text x="210" y="325" text-anchor="middle" class="ns">1 件文物 = 1 个孪生</text></g>
+        <g class="node" data-id="version"><rect x="80" y="370" width="260" height="54" rx="10" class="nb d"/><text x="210" y="393" text-anchor="middle" class="nt">版本 Version</text><text x="210" y="411" text-anchor="middle" class="ns">修复/再采集 → 新版本，旧版永存</text></g>
+        <g class="node" data-id="file"><rect x="80" y="456" width="260" height="54" rx="10" class="nb d"/><text x="210" y="479" text-anchor="middle" class="nt">数字文件 AssetFile</text><text x="210" y="497" text-anchor="middle" class="ns">L0 原始 → L1 高精 → L2 展示 → L3 缩略</text></g>
+        <path d="M210,166 L210,198" fill="none" stroke="#8b9bb4" stroke-width="2" marker-end="url(#mArr)"/>
+        <path d="M210,252 L210,284" fill="none" stroke="#8b9bb4" stroke-width="2" marker-end="url(#mArr)"/>
+        <path d="M210,338 L210,370" fill="none" stroke="#8b9bb4" stroke-width="2" marker-end="url(#mArr)"/>
+        <path d="M210,424 L210,456" fill="none" stroke="#8b9bb4" stroke-width="2" marker-end="url(#mArr)"/>
+
+        <path d="M340,483 L452,483 L452,139 L460,139" fill="none" stroke="#8b9bb4" stroke-width="2" marker-end="url(#mArr)"/>
+        <text x="456" y="520" class="lab">文件指纹上链（只存哈希，文件本体留在链下）</text>
+
+        <g class="node" data-id="hash"><rect x="460" y="112" width="340" height="54" rx="10" class="nb g"/><text x="630" y="135" text-anchor="middle" class="nt">哈希指纹计算</text><text x="630" y="153" text-anchor="middle" class="ns">SM3 + SHA-256 · Merkle 根上链</text></g>
+        <g class="node" data-id="registry"><rect x="460" y="198" width="340" height="54" rx="10" class="nb g"/><text x="630" y="221" text-anchor="middle" class="nt">登记合约 TwinRegistry</text><text x="630" y="239" text-anchor="middle" class="ns">twinId · 元数据指纹 · 当前版本 · 状态</text></g>
+        <g class="node" data-id="event"><rect x="460" y="284" width="340" height="54" rx="10" class="nb g"/><text x="630" y="307" text-anchor="middle" class="nt">溯源合约 ProvenanceLog</text><text x="630" y="325" text-anchor="middle" class="ns">事件只增不改 · 机构签名 + 证据哈希</text></g>
+        <g class="node" data-id="license"><rect x="460" y="370" width="340" height="54" rx="10" class="nb g"/><text x="630" y="393" text-anchor="middle" class="nt">授权合约 LicenseRegistry</text><text x="630" y="411" text-anchor="middle" class="ns">对象 · 范围 · 期限 · 收益分配</text></g>
+        <g class="node" data-id="audit"><rect x="460" y="456" width="340" height="54" rx="10" class="nb g"/><text x="630" y="479" text-anchor="middle" class="nt">审计合约 AuditLog</text><text x="630" y="497" text-anchor="middle" class="ns">谁 · 何时 · 访问了什么</text></g>
+        <path d="M630,166 L630,198" fill="none" stroke="#26a269" stroke-width="2" marker-end="url(#mArrG)"/>
+        <path d="M630,252 L630,284" fill="none" stroke="#26a269" stroke-width="2" marker-end="url(#mArrG)"/>
+        <path d="M630,338 L630,370" fill="none" stroke="#26a269" stroke-width="2" marker-end="url(#mArrG)"/>
+        <path d="M630,424 L630,456" fill="none" stroke="#26a269" stroke-width="2" marker-end="url(#mArrG)"/>
+        <path d="M630,510 L630,540" fill="none" stroke="#26a269" stroke-width="2" marker-end="url(#mArrG)"/>
+        <g class="node" data-id="block"><rect x="460" y="540" width="340" height="56" rx="10" fill="#26a269"/><text x="630" y="566" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">区块 #1 → #2 → #3 ……</text><text x="630" y="585" text-anchor="middle" fill="#d8f3e5" font-size="11">PBFT 共识 · 4–7 机构节点 · 国密 SM2/3/4</text></g>
+
+        <g class="node" data-id="verify"><rect x="880" y="112" width="300" height="54" rx="10" class="nb r"/><text x="1030" y="135" text-anchor="middle" class="nt">公众验证（只读）</text><text x="1030" y="153" text-anchor="middle" class="ns">本地算哈希 → 链上比对</text></g>
+        <g class="node" data-id="result"><rect x="880" y="198" width="300" height="54" rx="10" class="nb r"/><text x="1030" y="221" text-anchor="middle" class="nt">验证结论</text><text x="1030" y="239" text-anchor="middle" class="ns">官方原版 / 被篡改 / 未登记</text></g>
+        <g class="node" data-id="did"><rect x="880" y="284" width="300" height="54" rx="10" class="nb o"/><text x="1030" y="307" text-anchor="middle" class="nt">机构身份 DID</text><text x="1030" y="325" text-anchor="middle" class="ns">DID + 数字证书 · 私钥托管 KMS</text></g>
+        <g class="node" data-id="mgmt"><rect x="880" y="370" width="300" height="54" rx="10" class="nb o"/><text x="1030" y="393" text-anchor="middle" class="nt">馆藏单位（写入方）</text><text x="1030" y="411" text-anchor="middle" class="ns">登记 · 更新版本 · 授权（签名交易）</text></g>
+        <g class="node" data-id="evactor"><rect x="880" y="456" width="300" height="54" rx="10" class="nb o"/><text x="1030" y="479" text-anchor="middle" class="nt">鉴定/修复机构（签名方）</text><text x="1030" y="497" text-anchor="middle" class="ns">检测 · 修复 · 借展事件签名</text></g>
+        <path d="M1030,166 L1030,198" fill="none" stroke="#c01c28" stroke-width="2" marker-end="url(#mArr)"/>
+        <path d="M1030,338 L1030,370" fill="none" stroke="#b6c2d4" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#mArrD)"/>
+
+        <path d="M800,139 L880,139" fill="none" stroke="#26a269" stroke-width="2" marker-end="url(#mArrG)"/>
+        <text x="840" y="128" text-anchor="middle" class="lab">公开可查（只读）</text>
+        <path d="M880,397 L840,397 L840,225 L800,225" fill="none" stroke="#b6c2d4" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#mArrD)"/>
+        <text transform="translate(846,300) rotate(-90)" class="lab">写入（签名交易）</text>
+        <path d="M880,397 L800,397" fill="none" stroke="#b6c2d4" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#mArrD)"/>
+        <path d="M880,483 L840,483 L840,311 L800,311" fill="none" stroke="#b6c2d4" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#mArrD)"/>
+        <text transform="translate(846,400) rotate(-90)" class="lab">事件签名</text>
+      </svg>
+    </div>
+    <div class="legend">
+      <span><i class="dot" style="background:#1a5fb4"></i>数据与采集</span>
+      <span><i class="dot" style="background:#26a269"></i>链上信任层</span>
+      <span><i class="dot" style="background:#e66100"></i>机构身份与写入</span>
+      <span><i class="dot" style="background:#c01c28"></i>公众验证</span>
+      <span style="color:#333">实线 = 数据流 / 状态流，虚线 = 签名写入</span>
+    </div>
+    <div class="info" id="infoBox">
+      <h3 id="infoTitle"></h3>
+      <p id="infoText"></p>
+    </div>
+  </div>
+</section>
+<!-- ============ 业务流程 ============ -->
+<section id="tab-flows" class="tab">
+  <div class="hint"><b>怎么读：</b>四条流程对应四个场景。点「下一步」逐步走，或点「自动播放」看完整过程；<span style="color:#26a269">绿色 = 已完成</span>，<span style="color:#1a5fb4">蓝色 = 当前步</span>。</div>
+  <div class="flow-grid">
+    <div class="card flow-card" id="flow-reg">
+      <div class="flow-head"><span class="flow-name"></span><span class="flow-prog"></span></div>
+      <div class="steps"></div>
+      <div class="flow-controls">
+        <button onclick="flowStep('reg',-1)">← 上一步</button>
+        <button onclick="flowStep('reg',1)">下一步 →</button>
+        <button class="btn-auto" onclick="flowAuto('reg')">▶ 自动播放</button>
+      </div>
+    </div>
+    <div class="card flow-card" id="flow-trace">
+      <div class="flow-head"><span class="flow-name"></span><span class="flow-prog"></span></div>
+      <div class="steps"></div>
+      <div class="flow-controls">
+        <button onclick="flowStep('trace',-1)">← 上一步</button>
+        <button onclick="flowStep('trace',1)">下一步 →</button>
+        <button class="btn-auto" onclick="flowAuto('trace')">▶ 自动播放</button>
+      </div>
+    </div>
+    <div class="card flow-card" id="flow-lic">
+      <div class="flow-head"><span class="flow-name"></span><span class="flow-prog"></span></div>
+      <div class="steps"></div>
+      <div class="flow-controls">
+        <button onclick="flowStep('lic',-1)">← 上一步</button>
+        <button onclick="flowStep('lic',1)">下一步 →</button>
+        <button class="btn-auto" onclick="flowAuto('lic')">▶ 自动播放</button>
+      </div>
+    </div>
+    <div class="card flow-card" id="flow-verify">
+      <div class="flow-head"><span class="flow-name"></span><span class="flow-prog"></span></div>
+      <div class="steps"></div>
+      <div class="flow-controls">
+        <button onclick="flowStep('verify',-1)">← 上一步</button>
+        <button onclick="flowStep('verify',1)">下一步 →</button>
+        <button class="btn-auto" onclick="flowAuto('verify')">▶ 自动播放</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 系统架构 ============ -->
+<section id="tab-arch" class="tab">
+  <div class="card">
+    <h2>五层架构 <span class="tag">点击每一层查看职责说明</span></h2>
+    <div class="hint"><b>关键设计：</b>业务层通过<b>链适配层</b>访问区块链——未来换链（如切长安链）、跨链锚定都不影响上层；<b>链上只存哈希</b>，大文件在对象存储。</div>
+    <div class="layer" style="--lc:#1a5fb4" onclick="toggleLayer('l1')">
+      <div class="ln">应用层</div>
+      <div class="lc"><span class="chip">管理后台</span><span class="chip">公众查询端</span><span class="chip">数字展厅</span><span class="chip">开放 API</span></div>
+    </div>
+    <div class="layer-desc" id="d-l1">馆方在<b>管理后台</b>登记与维护；公众在<b>查询端</b>浏览、验证、看溯源时间线；<b>数字展厅</b>承载 L2/L3 展示级内容；<b>开放 API</b> 供第三方与研究机构接入。</div>
+    <div class="layer" style="--lc:#2b7fd4" onclick="toggleLayer('l2')">
+      <div class="ln">服务层</div>
+      <div class="lc"><span class="chip">孪生管理</span><span class="chip">登记</span><span class="chip">溯源</span><span class="chip">授权</span><span class="chip">审计</span><span class="chip">DID</span><span class="chip">文件服务</span></div>
+    </div>
+    <div class="layer-desc" id="d-l2">业务逻辑所在：文件哈希计算、交易构建与签名编排、工作流审批、对外接口。<b>写入类接口必须机构签名</b>，查询类接口只读。</div>
+    <div class="layer" style="--lc:#26a269" onclick="toggleLayer('l3')">
+      <div class="ln">链适配层</div>
+      <div class="lc"><span class="chip">统一接口：登记 / 查询 / 事件 / 订阅</span><span class="chip">隔离具体链实现</span></div>
+    </div>
+    <div class="layer-desc" id="d-l3">业务层只依赖统一接口，不感知底层是哪条链。这是"可演进"原则的落点：换链、升级链版本、跨链锚定都不牵动上层。</div>
+    <div class="layer" style="--lc:#0e8a7a" onclick="toggleLayer('l4')">
+      <div class="ln">链与数据层</div>
+      <div class="lc"><span class="chip">联盟链 FISCO BCOS（PBFT · 国密）</span><span class="chip">MinIO 对象存储</span><span class="chip">PostgreSQL</span><span class="chip">图库</span><span class="chip">搜索引擎</span></div>
+    </div>
+    <div class="layer-desc" id="d-l4"><b>链上</b>只存哈希与状态；<b>对象存储</b>存 L0–L3 分级加密文件；<b>关系库</b>存业务数据；<b>图库</b>存溯源关系（文物-事件-机构网络）；<b>搜索引擎</b>支撑元数据全文检索。</div>
+    <div class="layer" style="--lc:#813d9c" onclick="toggleLayer('l5')">
+      <div class="ln">采集层（线下）</div>
+      <div class="lc"><span class="chip">三维扫描</span><span class="chip">摄影测量</span><span class="chip">光谱检测</span><span class="chip">修复记录</span></div>
+    </div>
+    <div class="layer-desc" id="d-l5">L0/L1 原始数据的源头，<b>复用馆方现有设备与流程</b>，平台提供采集规范与工具，保证源头质量——这是链上数据可信的第一道关。</div>
+  </div>
+  <div class="card">
+    <h2>技术栈速查</h2>
+    <table>
+      <tr><th>模块</th><th>首选</th><th>备选</th><th>说明</th></tr>
+      <tr><td>后端服务</td><td>Go</td><td>Java(Spring Boot)</td><td>团队熟悉 Java 则用 Java</td></tr>
+      <tr><td>前端</td><td>Vue 3 + TypeScript</td><td>React</td><td>管理后台 + 公众端</td></tr>
+      <tr><td>数据库</td><td>PostgreSQL</td><td>MySQL</td><td>JSON 支持好，适合半结构化元数据</td></tr>
+      <tr><td>图库</td><td>Neo4j</td><td>NebulaGraph</td><td>溯源关系检索</td></tr>
+      <tr><td>对象存储</td><td>MinIO</td><td>云 OSS</td><td>私有化部署优先</td></tr>
+      <tr><td>链 SDK</td><td>FISCO BCOS SDK</td><td>长安链 SDK</td><td>经链适配层调用</td></tr>
+      <tr><td>密钥管理</td><td>KMS / HSM</td><td>Vault</td><td>机构私钥托管，多签</td></tr>
+    </table>
+  </div>
+</section>
+<!-- ============ 数据模型 ============ -->
+<section id="tab-data" class="tab">
+  <div class="card">
+    <h2>实体关系 <span class="tag">数字世界怎么组织文物数据</span></h2>
+    <div class="svg-wrap">
+      <svg viewBox="0 0 900 500" class="diagram">
+        <defs>
+          <marker id="mArr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b9bb4"/></marker>
+        </defs>
+        <g><rect x="40" y="40" width="180" height="92" rx="10" fill="#e8f1fb" stroke="#1a5fb4" stroke-width="1.5"/><text x="130" y="64" text-anchor="middle" font-size="14" font-weight="700" fill="#1c2430">Relic 文物</text><text x="52" y="86" font-size="11" fill="#5e6c84">relicId（馆藏编号）</text><text x="52" y="103" font-size="11" fill="#5e6c84">name · category · level</text><text x="52" y="120" font-size="11" fill="#5e6c84">period · material</text></g>
+        <g><rect x="360" y="40" width="180" height="92" rx="10" fill="#e6f6ee" stroke="#26a269" stroke-width="1.5"/><text x="450" y="64" text-anchor="middle" font-size="14" font-weight="700" fill="#1c2430">Twin 数字孪生</text><text x="372" y="86" font-size="11" fill="#5e6c84">twinId · orgDID</text><text x="372" y="103" font-size="11" fill="#5e6c84">currentVersionHash</text><text x="372" y="120" font-size="11" fill="#5e6c84">status（状态机）</text></g>
+        <g><rect x="680" y="40" width="180" height="92" rx="10" fill="#e6f6ee" stroke="#26a269" stroke-width="1.5"/><text x="770" y="64" text-anchor="middle" font-size="14" font-weight="700" fill="#1c2430">Version 版本</text><text x="692" y="86" font-size="11" fill="#5e6c84">versionId · twinId</text><text x="692" y="103" font-size="11" fill="#5e6c84">filesMerkleRoot</text><text x="692" y="120" font-size="11" fill="#5e6c84">producedAt/By</text></g>
+        <g><rect x="680" y="210" width="180" height="92" rx="10" fill="#e8f1fb" stroke="#1a5fb4" stroke-width="1.5"/><text x="770" y="234" text-anchor="middle" font-size="14" font-weight="700" fill="#1c2430">AssetFile 数字文件</text><text x="692" y="256" font-size="11" fill="#5e6c84">fileId · versionId</text><text x="692" y="273" font-size="11" fill="#5e6c84">sha256 · sm3</text><text x="692" y="290" font-size="11" fill="#5e6c84">grade（L0–L3）</text></g>
+        <g><rect x="360" y="210" width="180" height="92" rx="10" fill="#f0e8f7" stroke="#813d9c" stroke-width="1.5"/><text x="450" y="234" text-anchor="middle" font-size="14" font-weight="700" fill="#1c2430">Event 溯源事件</text><text x="372" y="256" font-size="11" fill="#5e6c84">eventId · twinId</text><text x="372" y="273" font-size="11" fill="#5e6c84">type（鉴定/修复/借展…）</text><text x="372" y="290" font-size="11" fill="#5e6c84">payloadHash · signerDID</text></g>
+        <g><rect x="40" y="210" width="180" height="92" rx="10" fill="#fdeee0" stroke="#e66100" stroke-width="1.5"/><text x="130" y="234" text-anchor="middle" font-size="14" font-weight="700" fill="#1c2430">License 授权</text><text x="52" y="256" font-size="11" fill="#5e6c84">licenseId · twinId</text><text x="52" y="273" font-size="11" fill="#5e6c84">grantee · scope</text><text x="52" y="290" font-size="11" fill="#5e6c84">validFrom/To · 收益</text></g>
+        <g><rect x="360" y="380" width="180" height="92" rx="10" fill="#fdeee0" stroke="#e66100" stroke-width="1.5"/><text x="450" y="404" text-anchor="middle" font-size="14" font-weight="700" fill="#1c2430">Org/Person 机构·人</text><text x="372" y="426" font-size="11" fill="#5e6c84">did · name · role</text><text x="372" y="443" font-size="11" fill="#5e6c84">pubKeys</text><text x="372" y="460" font-size="11" fill="#5e6c84">签发 VC 凭证</text></g>
+        <path d="M220,86 L360,86" fill="none" stroke="#8b9bb4" stroke-width="1.8" marker-end="url(#mArr2)"/><text x="288" y="78" text-anchor="middle" font-size="11" fill="#5e6c84">1 : 1</text>
+        <path d="M540,86 L680,86" fill="none" stroke="#8b9bb4" stroke-width="1.8" marker-end="url(#mArr2)"/><text x="608" y="78" text-anchor="middle" font-size="11" fill="#5e6c84">1 : n</text>
+        <path d="M770,132 L770,210" fill="none" stroke="#8b9bb4" stroke-width="1.8" marker-end="url(#mArr2)"/><text x="782" y="176" font-size="11" fill="#5e6c84">1 : n</text>
+        <path d="M450,132 L450,210" fill="none" stroke="#8b9bb4" stroke-width="1.8" marker-end="url(#mArr2)"/><text x="462" y="176" font-size="11" fill="#5e6c84">1 : n</text>
+        <path d="M360,120 C280,120 280,210 220,210" fill="none" stroke="#8b9bb4" stroke-width="1.8" marker-end="url(#mArr2)"/><text x="260" y="150" font-size="11" fill="#5e6c84">1 : n 授权</text>
+        <path d="M360,420 L360,302" fill="none" stroke="#b6c2d4" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#mArr2)"/><text x="372" y="370" font-size="11" fill="#5e6c84">签名作证</text>
+        <path d="M360,460 C260,460 260,256 220,256" fill="none" stroke="#b6c2d4" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#mArr2)"/><text x="262" y="380" font-size="11" fill="#5e6c84">签发/审批</text>
+      </svg>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h2>孪生状态机 <span class="tag">一个孪生的一生</span></h2>
+      <div class="svg-wrap">
+        <svg viewBox="0 0 880 300" class="diagram">
+          <defs>
+            <marker id="mArr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#8b9bb4"/></marker>
+          </defs>
+          <g><rect x="30" y="50" width="130" height="46" rx="10" fill="#f4f7fb" stroke="#8b9bb4" stroke-width="1.5"/><text x="95" y="78" text-anchor="middle" font-size="13.5" font-weight="700">DRAFT 草稿</text></g>
+          <g><rect x="230" y="50" width="160" height="46" rx="10" fill="#e8f1fb" stroke="#1a5fb4" stroke-width="1.5"/><text x="310" y="78" text-anchor="middle" font-size="13.5" font-weight="700">PENDING_REVIEW</text></g>
+          <g><rect x="460" y="50" width="150" height="46" rx="10" fill="#e6f6ee" stroke="#26a269" stroke-width="1.5"/><text x="535" y="78" text-anchor="middle" font-size="13.5" font-weight="700">REGISTERED</text></g>
+          <path d="M160,73 L230,73" fill="none" stroke="#8b9bb4" stroke-width="1.8" marker-end="url(#mArr3)"/><text x="195" y="65" text-anchor="middle" font-size="11" fill="#5e6c84">提交审核</text>
+          <path d="M390,73 L460,73" fill="none" stroke="#8b9bb4" stroke-width="1.8" marker-end="url(#mArr3)"/><text x="425" y="65" text-anchor="middle" font-size="11" fill="#5e6c84">审核通过</text>
+          <g><rect x="660" y="10" width="150" height="42" rx="10" fill="#fdeee0" stroke="#e66100" stroke-width="1.5"/><text x="735" y="36" text-anchor="middle" font-size="13" font-weight="700">ON_LOAN 借展</text></g>
+          <g><rect x="660" y="72" width="150" height="42" rx="10" fill="#fdeee0" stroke="#e66100" stroke-width="1.5"/><text x="735" y="98" text-anchor="middle" font-size="13" font-weight="700">SEALED 封存</text></g>
+          <g><rect x="660" y="134" width="150" height="42" rx="10" fill="#f0e8f7" stroke="#813d9c" stroke-width="1.5"/><text x="735" y="160" text-anchor="middle" font-size="13" font-weight="700">REPAIRING 修复中</text></g>
+          <path d="M610,60 L660,31" fill="none" stroke="#8b9bb4" stroke-width="1.6" marker-end="url(#mArr3)"/>
+          <path d="M610,73 L660,93" fill="none" stroke="#8b9bb4" stroke-width="1.6" marker-end="url(#mArr3)"/>
+          <path d="M610,90 L660,155" fill="none" stroke="#8b9bb4" stroke-width="1.6" marker-end="url(#mArr3)"/>
+          <path d="M660,31 C590,10 560,45 535,45" fill="none" stroke="#b6c2d4" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#mArr3)"/><text x="585" y="22" text-anchor="middle" font-size="10.5" fill="#5e6c84">归还</text>
+          <path d="M660,93 C590,105 560,100 535,96" fill="none" stroke="#b6c2d4" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#mArr3)"/><text x="585" y="115" text-anchor="middle" font-size="10.5" fill="#5e6c84">解封</text>
+          <g><rect x="460" y="200" width="170" height="46" rx="10" fill="#e6f6ee" stroke="#26a269" stroke-width="1.5"/><text x="545" y="228" text-anchor="middle" font-size="13.5" font-weight="700">UPDATED 已更新版本</text></g>
+          <path d="M735,176 L735,205 L630,205" fill="none" stroke="#8b9bb4" stroke-width="1.8" marker-end="url(#mArr3)"/><text x="700" y="200" text-anchor="middle" font-size="11" fill="#5e6c84">登记新版本</text>
+          <path d="M460,223 C390,223 390,96 460,96" fill="none" stroke="#b6c2d4" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#mArr3)"/>
+          <g><rect x="240" y="200" width="160" height="46" rx="10" fill="#fbe9ea" stroke="#c01c28" stroke-width="1.5"/><text x="320" y="228" text-anchor="middle" font-size="13.5" font-weight="700">ARCHIVED / RETIRED</text></g>
+          <path d="M400,223 L400,180 L535,96" fill="none" stroke="#b6c2d4" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#mArr3)"/><text x="440" y="175" text-anchor="middle" font-size="10.5" fill="#5e6c84">注销/灭失</text>
+        </svg>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:8px">规则：状态变更必须经授权机构签名；历史版本永不删除。</p>
+    </div>
+    <div class="card">
+      <h2>文件分级 L0–L3</h2>
+      <table>
+        <tr><th>级别</th><th>内容</th><th>谁能看</th></tr>
+        <tr><td><b>L0</b></td><td>原始采集数据</td><td>仅馆藏单位 / 授权修复机构</td></tr>
+        <tr><td><b>L1</b></td><td>完整高精度模型</td><td>授权机构（研究、修复）</td></tr>
+        <tr><td><b>L2</b></td><td>展示级模型（降精度+标识）</td><td>公众</td></tr>
+        <tr><td><b>L3</b></td><td>缩略图 / 预览</td><td>公开</td></tr>
+      </table>
+      <h2 style="margin-top:16px">溯源事件类型</h2>
+      <table>
+        <tr><th>事件</th><th>含义</th></tr>
+        <tr><td>COLLECTED</td><td>数字化采集</td></tr>
+        <tr><td>APPRAISED / EXAMINED</td><td>鉴定 / 检测</td></tr>
+        <tr><td>RESTORED</td><td>修复（含前后版本哈希）</td></tr>
+        <tr><td>LOANED_OUT / RETURNED</td><td>借展出 / 归还</td></tr>
+        <tr><td>PUBLISHED / LICENSED</td><td>出版 / 授权</td></tr>
+        <tr><td>VERSION_UPDATED / RETIRED</td><td>版本更新 / 注销灭失</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+<!-- ============ 路线图 ============ -->
+<section id="tab-roadmap" class="tab">
+  <div class="card">
+    <h2>五阶段路线 <span class="tag">M0 → M4，先闭环、再扩展、后生态</span></h2>
+    <div class="tl">
+      <div class="tl-item" style="--tc:#8b9bb4"><div class="mid">M0 调研与标准</div><div class="time">1–2 月</div><ul><li>试点馆现状调研</li><li>元数据规范 v1</li><li>采集规范 v1</li></ul></div>
+      <div class="tl-item" style="--tc:#1a5fb4"><div class="mid">M1 MVP 单馆试点</div><div class="time">2–3 月</div><ul><li>联盟链 4 节点</li><li>登记/溯源合约</li><li>管理后台</li><li>公众验证页</li></ul></div>
+      <div class="tl-item" style="--tc:#26a269"><div class="mid">M2 流水线+分级展示</div><div class="time">2–3 月</div><ul><li>采集工具链</li><li>L0–L3 分级存储</li><li>公众查询端</li><li>审计上链</li></ul></div>
+      <div class="tl-item" style="--tc:#e66100"><div class="mid">M3 联盟扩展与互认</div><div class="time">3–6 月</div><ul><li>DID/VC 体系</li><li>跨馆互认</li><li>链浏览器</li></ul></div>
+      <div class="tl-item" style="--tc:#813d9c"><div class="mid">M4 授权与生态</div><div class="time">持续</div><ul><li>授权平台</li><li>收益分配</li><li>开放 API</li><li>数字藏品（单独论证）</li></ul></div>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted)">策略：<b>M1 先跑通"登记—溯源—验证"最小闭环</b>，证明价值后再扩展；数字藏品合规风险高，放到最后单独论证。</p>
+  </div>
+  <div class="card">
+    <h2>MVP（M1）范围</h2>
+    <div class="inout">
+      <div class="inbox"><h4>✔ 包含</h4><ul><li>联盟链 4 节点（主管部门/试点馆/公证/平台方）</li><li>TwinRegistry + ProvenanceLog 合约</li><li>管理后台：登记、状态、事件录入</li><li>公众验证页：传文件 → 比对 → 结论</li><li>溯源查询：按文物看事件时间线</li></ul></div>
+      <div class="outbox"><h4>✘ 不包含（进入 M2+）</h4><ul><li>数字藏品发行</li><li>完整 DID/VC 体系</li><li>图库检索、开放 API</li><li>跨链司法锚定</li></ul></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>验收标准（可测）与度量指标</h2>
+    <div class="grid2">
+      <table>
+        <tr><th>场景</th><th>验收标准</th></tr>
+        <tr><td>登记</td><td>提交后 10 秒内链浏览器可查</td></tr>
+        <tr><td>验证</td><td>篡改 1 字节，验证页必须判"被篡改"</td></tr>
+        <tr><td>溯源</td><td>任意事件 5 秒内完成链上核验</td></tr>
+        <tr><td>容错</td><td>停 1 个链节点，业务不受影响</td></tr>
+        <tr><td>安全</td><td>未授权角色无法写入合约</td></tr>
+      </table>
+      <table>
+        <tr><th>指标</th><th>M3 目标</th></tr>
+        <tr><td>登记文物数</td><td>≥ 500 件</td></tr>
+        <tr><td>溯源事件数</td><td>≥ 5000 条</td></tr>
+        <tr><td>接入机构数</td><td>≥ 5 家</td></tr>
+        <tr><td>公众验证查询</td><td>月均 ≥ 1 万次</td></tr>
+        <tr><td>数据完整率</td><td>100%（抽查）</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 决策清单 ============ -->
+<section id="tab-decisions" class="tab">
+  <div class="card">
+    <h2>开工前需要您拍板的 5 件事 <span class="tag">点击选项即选择，浏览器会自动记住</span></h2>
+    <div class="hint">带 <span style="background:#26a269;color:#fff;border-radius:8px;padding:0 7px;font-size:11px">推荐</span> 标签的是设计文档中的建议项。定完这 5 件即可启动 M0/M1。</div>
+    <div id="decList"></div>
+    <div class="decbar" id="decCount">已决策 0 / 5</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  文件：F:\数字化区块链\可视化总览.html（离线可用，双击浏览器打开） · 工作代号：文博链 RelicChain · 配套设计文档：docs\01–06
+</footer>
+<button class="totop" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+window.addEventListener('scroll', function(){
+  document.getElementById('toTop').classList.toggle('show', window.scrollY > 600);
+});
+/* ================= 页签 ================= */
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+  document.getElementById('tab-' + id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-tab') === id); });
+}
+
+/* ================= 一图看懂：节点说明 ================= */
+var NODE_INFO = {
+  relic:    { t:'实物文物 Relic', d:'数字化的对象，以馆藏编号唯一标识。区块链只记录它的数字孪生指纹与事件，不改变文物所有权、不触碰实物交易。' },
+  collect:  { t:'数字化采集', d:'三维扫描、摄影测量、光谱检测、病害记录。复用馆方现有设备与流程，平台提供采集规范——源头质量是链上数据可信的第一道关。' },
+  twin:     { t:'数字孪生 Twin', d:'1 件文物 = 1 个孪生，包含元数据（名称/年代/材质/等级）与版本序列，是链上登记的基本对象。' },
+  version:  { t:'版本 Version', d:'修复或再采集后产生新版本。旧版本永不删除，任何历史时点的数据都可回溯比对。' },
+  file:     { t:'数字文件 AssetFile（L0–L3）', d:'L0 原始数据（仅馆方）→ L1 高精度模型（授权机构）→ L2 展示级（公众）→ L3 缩略图（公开）。文件本体存在链下对象存储，链上只存指纹。' },
+  hash:     { t:'哈希指纹计算', d:'对每个文件计算 SM3 + SHA-256 双哈希；一个版本的全部文件构成 Merkle 树，只把根哈希上链。链上极小、链下完整，篡改 1 字节指纹就变。' },
+  registry: { t:'登记合约 TwinRegistry', d:'链上存 twinId、馆藏编号、元数据指纹、当前版本哈希、状态。只有馆藏单位 DID 可以调用，登记即确权。' },
+  event:    { t:'溯源合约 ProvenanceLog', d:'鉴定、检测、修复、借展等事件只增不改地追加，每条事件带机构签名与证据哈希——这就是"全程可溯、不可抵赖"。' },
+  license:  { t:'授权合约 LicenseRegistry', d:'记录数字资源的使用对象、范围、期限、收益分配；可审计、可撤销，解决版权与授权边界模糊问题。' },
+  audit:    { t:'审计合约 AuditLog', d:'数据访问行为留痕上链：谁、在何时、访问了什么，可查证。配合 L0–L3 分级防止高精度模型流向不明。' },
+  block:    { t:'区块与共识', d:'4–7 个机构节点共同记账，PBFT 共识（4 节点可容忍 1 个故障），国密 SM2/3/4。文物场景是低频高价值写入，链性能富余。' },
+  verify:   { t:'公众验证（只读）', d:'无需任何权限即可读链上登记：把拿到的文件在本地计算哈希，与链上指纹比对——秒级出结论。' },
+  result:   { t:'验证结论', d:'三种结果：官方原版（指纹一致）/ 被篡改（不一致）/ 未登记（链上查无此物）。任何人可核，无需信任平台。' },
+  did:      { t:'机构身份 DID', d:'机构去中心化身份 + 数字证书，私钥托管 KMS/HSM，关键操作多签。身份是整个信任体系的根。' },
+  mgmt:     { t:'馆藏单位（写入方）', d:'创建孪生、提交登记、发布新版本、发起授权——所有写入都是机构签名交易，合约校验身份与权限。' },
+  evactor:  { t:'鉴定/修复机构（签名方）', d:'对检测、修复、借展等事实签名作证，还可签发可验证凭证（VC），例如检测报告。' }
+};
+function showInfo(id){
+  var n = NODE_INFO[id]; if (!n) return;
+  document.getElementById('infoTitle').textContent = '▍' + n.t;
+  document.getElementById('infoText').textContent = n.d;
+  document.querySelectorAll('#ovSvg .node').forEach(function(g){ g.classList.toggle('sel', g.getAttribute('data-id') === id); });
+}
+document.querySelectorAll('#ovSvg .node').forEach(function(g){
+  g.addEventListener('click', function(){ showInfo(this.getAttribute('data-id')); });
+});
+showInfo('hash');
+
+/* ================= 业务流程步进 ================= */
+var FLOWS = {
+  reg: { name:'流程一 · 采集登记', steps:['三维扫描 / 摄影测量采集','质量审核','计算文件哈希（SM3 / SHA-256，Merkle 根）','馆藏单位 DID 签名','链上 registerTwin 登记','对外可验证：任何人可核'] },
+  trace: { name:'流程二 · 检测/修复溯源', steps:['发起检测 / 修复工单','机构执行并产出报告等证据','证据哈希 + 机构签名','链上 appendEvent 追加事件','若文物数据变化 → 登记新版本（旧版保留）','公众可查事件时间线并核验'] },
+  lic: { name:'流程三 · 数字资源授权', steps:['研究机构提交使用申请','馆藏单位审批','授权合约记录：对象 / 范围 / 期限 / 费用','交付加密包（水印 / 授权标识）','使用行为留痕审计','到期 / 违规可撤销'] },
+  verify: { name:'流程四 · 公众验证', steps:['获得数字文件（下载 / 收到）','本地计算文件哈希','与链上登记记录比对','结论：官方原版 / 被篡改 / 未登记'] }
+};
+var flowState = {};
+Object.keys(FLOWS).forEach(function(k){ flowState[k] = { i:0, timer:null }; });
+function renderFlow(k){
+  var card = document.getElementById('flow-' + k);
+  var f = FLOWS[k], s = flowState[k].i;
+  card.querySelector('.flow-name').textContent = f.name;
+  card.querySelector('.flow-prog').textContent = '第 ' + (s+1) + ' / ' + f.steps.length + ' 步';
+  var list = card.querySelector('.steps');
+  list.innerHTML = '';
+  f.steps.forEach(function(st, idx){
+    var d = document.createElement('div');
+    d.className = 'step' + (idx === s ? ' on' : (idx < s ? ' done' : ''));
+    d.innerHTML = '<span class="num">' + (idx < s ? '✓' : (idx + 1)) + '</span><span>' + st + '</span>';
+    list.appendChild(d);
+  });
+}
+function flowStep(k, delta){
+  var st = flowState[k];
+  st.i = Math.max(0, Math.min(FLOWS[k].steps.length - 1, st.i + delta));
+  renderFlow(k);
+}
+function flowAuto(k){
+  var st = flowState[k];
+  var btn = document.querySelector('#flow-' + k + ' .btn-auto');
+  if (st.timer){ clearInterval(st.timer); st.timer = null; btn.textContent = '▶ 自动播放'; return; }
+  btn.textContent = '⏸ 暂停';
+  st.timer = setInterval(function(){
+    st.i = (st.i + 1) % FLOWS[k].steps.length;
+    renderFlow(k);
+  }, 1500);
+}
+Object.keys(FLOWS).forEach(renderFlow);
+
+/* ================= 架构分层 ================= */
+function toggleLayer(id){
+  document.querySelectorAll('.layer-desc').forEach(function(d){ if (d.id !== 'd-' + id) d.classList.remove('show'); });
+  document.getElementById('d-' + id).classList.toggle('show');
+}
+
+/* ================= 决策清单 ================= */
+var DECISIONS = [
+  { id:'d1', q:'Q1 · 首批试点机构？', opts:[ {t:'A. 已有候选馆（稍后告知名单）'}, {t:'B. 尚未确定，先做技术验证', rec:true} ] },
+  { id:'d2', q:'Q2 · 链平台偏好？', opts:[ {t:'FISCO BCOS', rec:true}, {t:'长安链'}, {t:'其他（BSN / 蚂蚁链）'} ] },
+  { id:'d3', q:'Q3 · 数字藏品模块？', opts:[ {t:'MVP 不含，M4 单独合规论证', rec:true}, {t:'现在就纳入规划'} ] },
+  { id:'d4', q:'Q4 · 预算与团队？', opts:[ {t:'已有预算与团队'}, {t:'尚未立项，先出立项材料'} ] },
+  { id:'d5', q:'Q5 · 与馆藏系统对接？', opts:[ {t:'需要对接现有系统'}, {t:'暂无，全新建设'} ] }
+];
+function buildDecisions(){
+  var wrap = document.getElementById('decList');
+  DECISIONS.forEach(function(d){
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.setAttribute('data-group', d.id);
+    var html = '<div class="q">' + d.q + '</div><div class="opts">';
+    d.opts.forEach(function(o){
+      html += '<div class="opt" data-v="' + o.t + '" onclick="pick(this, \'' + d.id + '\')">' + o.t + (o.rec ? '<span class="rec">推荐</span>' : '') + '</div>';
+    });
+    html += '</div>';
+    card.innerHTML = html;
+    wrap.appendChild(card);
+    var saved = localStorage.getItem('rc-' + d.id);
+    if (saved){
+      card.querySelectorAll('.opt').forEach(function(o){ if (o.getAttribute('data-v') === saved) o.classList.add('sel'); });
+    }
+  });
+  updateDec();
+}
+function pick(el, groupId){
+  document.querySelectorAll('[data-group="' + groupId + '"] .opt').forEach(function(o){ o.classList.remove('sel'); });
+  el.classList.add('sel');
+  localStorage.setItem('rc-' + groupId, el.getAttribute('data-v'));
+  updateDec();
+}
+function updateDec(){
+  var c = 0;
+  DECISIONS.forEach(function(d){ if (localStorage.getItem('rc-' + d.id)) c++; });
+  var bar = document.getElementById('decCount');
+  bar.textContent = c === 5 ? '✓ 5 件事已全部决策，可以启动 M0/M1' : '已决策 ' + c + ' / 5';
+  bar.style.color = c === 5 ? '#26a269' : '';
+}
+buildDecisions();
+</script>
+</body>
+</html>
+
+

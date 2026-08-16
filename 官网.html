@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文博链 RelicChain · 官方网站</title>
+<style>
+:root{--ink:#12203a;--muted:#64748b;--blue:#1d4ed8;--blue2:#3b82f6;--gold:#b8860b;--line:#e2e8f0;--bg:#f4f7fb;--card:#fff;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+a{text-decoration:none;color:inherit}
+.nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;gap:10px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;letter-spacing:1px}
+.logo .ic{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px}
+.nav-links{display:flex;gap:22px;font-size:14px;color:#475569}
+.nav-links a:hover{color:var(--blue)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.lang-btn{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:7px 13px;font-size:13px;font-weight:700;color:var(--blue);cursor:pointer}
+.nav-cta{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13.5px;font-weight:700;cursor:pointer;box-shadow:0 4px 12px rgba(29,78,216,.3)}
+.hero{position:relative;overflow:hidden;background:linear-gradient(135deg,#0a1a33 0%,#123a6b 45%,#1d4ed8 100%);color:#fff;padding:96px 32px 84px;text-align:center}
+.hero::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,.3),transparent 70%);top:-160px;right:-120px}
+.hero::after{content:"";position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(184,134,11,.25),transparent 70%);bottom:-140px;left:-100px}
+.hero h1{position:relative;font-size:40px;font-weight:800;letter-spacing:3px;margin-bottom:14px}
+.hero .gold-line{position:relative;width:64px;height:3px;border-radius:3px;background:linear-gradient(90deg,#d4a943,#f3d27a);margin:0 auto 18px}
+.hero p{position:relative;font-size:16px;opacity:.9;max-width:680px;margin:0 auto 30px}
+.hero-btns{position:relative;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hbtn{display:inline-block;border-radius:12px;padding:13px 28px;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.hbtn.primary{background:linear-gradient(135deg,#d4a943,#b8860b);color:#12203a;box-shadow:0 8px 22px rgba(212,169,67,.4)}
+.hbtn.primary:hover{transform:translateY(-2px)}
+.hbtn.ghost{border:1.5px solid rgba(255,255,255,.55);color:#fff}
+.hbtn.ghost:hover{background:rgba(255,255,255,.12)}
+.hero-stats{position:relative;display:flex;gap:34px;justify-content:center;margin-top:40px;flex-wrap:wrap}
+.hstat{text-align:center}
+.hstat .v{font-size:24px;font-weight:800;color:#f3d27a}
+.hstat .k{font-size:12.5px;opacity:.75;margin-top:2px}
+section{padding:64px 32px}
+.sec-head{text-align:center;margin-bottom:38px}
+.sec-head .en{font-size:12px;letter-spacing:4px;color:var(--gold);font-weight:700}
+.sec-head h2{font-size:27px;font-weight:800;letter-spacing:1px;margin-top:6px}
+.sec-head p{font-size:14px;color:var(--muted);margin-top:8px;max-width:560px;margin-left:auto;margin-right:auto}
+.wrap{max-width:1120px;margin:0 auto}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.fcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px 20px;transition:all .2s ease;position:relative;overflow:hidden}
+.fcard::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--blue2));opacity:0;transition:opacity .2s}
+.fcard:hover{transform:translateY(-5px);box-shadow:0 12px 28px rgba(15,23,42,.12)}
+.fcard:hover::before{opacity:1}
+.fcard .fi{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#eff6ff,#e0eaff);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:14px}
+.fcard h3{font-size:16.5px;margin-bottom:6px}
+.fcard p{font-size:13px;color:var(--muted)}
+.relic-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;transition:all .2s}
+.relic-card:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(15,23,42,.1)}
+.relic-card .ri{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:12px}
+.relic-card h3{font-size:16px;margin-bottom:4px}
+.relic-card .meta{font-size:12px;color:var(--muted);margin-bottom:10px}
+.lv{display:inline-block;font-size:11px;border-radius:10px;padding:1px 9px;color:#fff;font-weight:600}
+.lv1{background:var(--gold)} .lv2{background:#64748b}
+.fp{font-family:Consolas,monospace;font-size:11px;color:#475569;background:#f1f5f9;border:1px solid var(--line);border-radius:8px;padding:4px 8px;word-break:break-all;margin-top:10px}
+@media(max-width:760px){
+  .nav{flex-wrap:wrap;height:auto;padding:10px 16px;gap:8px}
+  .nav-links{order:3;width:100%;justify-content:space-between;gap:4px;font-size:12.5px;overflow-x:auto;padding-bottom:4px}
+  .nav-cta{font-size:12.5px;padding:8px 14px}
+  .hero{padding:52px 18px 44px}
+  .hero h1{font-size:26px;letter-spacing:1px}
+  .hero p{font-size:14px}
+  .hero-btns{flex-direction:column;align-items:stretch;max-width:360px;margin:0 auto}
+  .hbtn{width:100%}
+  .hero-stats{gap:16px 26px}
+  .hstat .v{font-size:19px}
+  section{padding:40px 16px}
+  .sec-head h2{font-size:22px}
+  .grid4{grid-template-columns:1fr 1fr;gap:10px}
+}
+@media(max-width:440px){.grid4{grid-template-columns:1fr}.hero h1{font-size:22px}}
+html{scroll-behavior:smooth}
+.nav-links a.active{color:var(--blue);font-weight:700}
+.totop{position:fixed;right:24px;bottom:24px;z-index:60;background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;border:none;border-radius:50%;width:46px;height:46px;font-size:17px;cursor:pointer;box-shadow:0 8px 20px rgba(29,78,216,.4);opacity:0;pointer-events:none;transition:all .25s}
+.totop.show{opacity:1;pointer-events:auto}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo"><span class="ic">⛓️</span>文博链 RelicChain</div>
+  <div class="nav-links">
+    <a href="#features" data-t="nav1">平台能力</a>
+    <a href="#relics" data-t="nav2">精选文物</a>
+    <a href="#demo" data-t="nav3">数字体验</a>
+    <a href="#news" data-t="nav4">动态</a>
+    <a href="#about" data-t="nav5">关于</a>
+  </div>
+  <div class="nav-right">
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">EN</button>
+    <button class="nav-cta" data-t="cta" onclick="location.href='区块链平台.html'">进入平台</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <h1 data-t="heroT">让每件文物，可信、可查、可传承</h1>
+  <div class="gold-line"></div>
+  <p data-t="heroS">文博链为文物数字化提供区块链可信底座：数字登记、全程溯源、授权管理、真伪验证——手机浏览器打开就是平台，双击就能演示。</p>
+  <div class="hero-btns">
+    <a class="hbtn primary" data-t="bt1" href="区块链平台.html">🚀 立即体验平台</a>
+    <a class="hbtn ghost" data-t="bt2" href="区块链演示.html">▶ 观看原理演示</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hstat"><div class="v">4</div><div class="k" data-t="s1k">联盟共识节点</div></div>
+    <div class="hstat"><div class="v">8</div><div class="k" data-t="s2k">平台功能</div></div>
+    <div class="hstat"><div class="v">10</div><div class="k" data-t="s3k">分钟看懂区块链</div></div>
+    <div class="hstat"><div class="v">6000+</div><div class="k" data-t="s4k">全国博物馆</div></div>
+  </div>
+</header>
+<section id="features">
+  <div class="wrap">
+    <div class="sec-head"><div class="en">PLATFORM</div><h2 data-t="h1t">平台能力</h2><p data-t="h1p">四个核心模块，覆盖文物数字资产全生命周期</p></div>
+    <div class="grid4">
+      <div class="fcard"><div class="fi">📝</div><h3 data-t="f1t">数字登记</h3><p data-t="f1d">文物建立数字孪生，内容指纹与元数据写入链上，登记即确权。</p></div>
+      <div class="fcard"><div class="fi">🧾</div><h3 data-t="f2t">全程溯源</h3><p data-t="f2d">检测、修复、借展事件只增不改，任何历史时点可回溯。</p></div>
+      <div class="fcard"><div class="fi">📜</div><h3 data-t="f3t">授权管理</h3><p data-t="f3d">数字资源授权对象、用途、期限全程留痕，可审计可撤销。</p></div>
+      <div class="fcard"><div class="fi">🔍</div><h3 data-t="f4t">真伪验证</h3><p data-t="f4d">本地计算哈希与链上比对，篡改 1 字节立刻现形，打印存证凭证。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="relics" style="background:#fff">
+  <div class="wrap">
+    <div class="sec-head"><div class="en">COLLECTION</div><h2 data-t="h2t">精选文物</h2><p data-t="h2p">碧水寺摩崖造像数字化档案（示例数据，取得授权后替换真实资料）</p></div>
+    <div class="grid4">
+      <div class="relic-card"><div class="ri" style="background:#e8f1fb">🏛️</div><h3 data-t="r1t">摩崖造像 · 主尊龛</h3><div class="meta" data-t="r1m">碧水寺-001 · 隋 · 砂岩</div><div><span class="lv lv1" data-t="lv1">一级</span></div><div class="fp"><span data-t="r1f">指纹 0x9f3a…c21e</span> · <span data-t="rb1">区块 #1</span></div></div>
+      <div class="relic-card"><div class="ri" style="background:#e6f6ee">🪷</div><h3 data-t="r2t">摩崖造像 · 说法图</h3><div class="meta" data-t="r2m">碧水寺-002 · 隋 · 砂岩</div><div><span class="lv lv1" data-t="lv1">一级</span></div><div class="fp"><span data-t="r2f">指纹 0x7c2d…ab09</span> · <span data-t="rb2">区块 #2</span></div></div>
+      <div class="relic-card"><div class="ri" style="background:#fdeee0">🧘</div><h3 data-t="r3t">胁侍菩萨龛</h3><div class="meta" data-t="r3m">碧水寺-003 · 唐 · 砂岩</div><div><span class="lv lv2" data-t="lv2">二级</span></div><div class="fp"><span data-t="r3f">指纹 0x31e8…77d4</span> · <span data-t="rb3">区块 #3</span></div></div>
+      <div class="relic-card"><div class="ri" style="background:#f0e8f7">📜</div><h3 data-t="r4t">碑刻 · 题记</h3><div class="meta" data-t="r4m">碧水寺-004 · 隋 · 石灰岩</div><div><span class="lv lv2" data-t="lv2">二级</span></div><div class="fp"><span data-t="r4f">指纹 0x85b1…04aa</span> · <span data-t="rb4">区块 #4</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <div class="sec-head"><div class="en">EXPERIENCE</div><h2 data-t="h3t">数字体验</h2><p data-t="h3p">四个入口，从原理到产品，全部离线可用</p></div>
+    <div class="grid4">
+      <a class="fcard" href="区块链平台.html" style="display:block"><div class="fi">📱</div><h3 data-t="d1t">平台本体</h3><p data-t="d1d">选身份登录，登记/溯源/授权/验证/审计，手机浏览器即 APP。</p></a>
+      <a class="fcard" href="区块链演示.html" style="display:block"><div class="fi">🧩</div><h3 data-t="d2t">原理演示</h3><p data-t="d2d">五步看懂：挖矿、篡改、验证、为什么改不回去。</p></a>
+      <a class="fcard" href="存证演示demo.html" style="display:block"><div class="fi">🔐</div><h3 data-t="d3t">存证演示</h3><p data-t="d3d">下载档案 → 改一个字 → 上传验证，秒判真伪。</p></a>
+      <a class="fcard" href="可视化总览.html" style="display:block"><div class="fi">🗺️</div><h3 data-t="d4t">一图看懂</h3><p data-t="d4d">交互式总览：核心逻辑、架构、数据模型、路线图。</p></a>
+    </div>
+  </div>
+</section>
+
+<section id="news" style="background:#fff">
+  <div class="wrap">
+    <div class="sec-head"><div class="en">NEWS</div><h2 data-t="h4t">项目动态</h2></div>
+    <div class="grid4">
+      <div class="fcard"><div class="fi">📢</div><h3 data-t="n1t">平台 v1.3 上线</h3><p data-t="n1d">多账号登录、管理员机构/账号管理、审计日志、存证凭证打印与下载。</p></div>
+      <div class="fcard"><div class="fi">🏛️</div><h3 data-t="n2t">碧水寺摩崖造像数字化</h3><p data-t="n2d">参与绵阳市博物馆采购项目扫描工作，四件文物数字档案已入驻平台。</p></div>
+      <div class="fcard"><div class="fi">🤝</div><h3 data-t="n3t">联合试点推进中</h3><p data-t="n3d">与上海建为历保洽谈"文物数字资产存证"联合小试点（免费、双品牌、不商用）。</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head"><div class="en">ABOUT</div><h2 data-t="h5t">关于我们</h2><p data-t="h5p">大学生创业团队 · 数字媒体 / 计算机 / 网络工程 / 物联网</p></div>
+    <div class="grid4">
+      <div class="fcard"><div class="fi">🎯</div><h3 data-t="a1t">项目背景</h3><p data-t="a1d">文物数字化成果分散、授权无据、真伪难辨——我们用区块链补上"信任"这块拼图。</p></div>
+      <div class="fcard"><div class="fi">🏢</div><h3 data-t="a2t">合作机构</h3><p data-t="a2d">上海建为历保（扫描项目合作）· 绵阳市博物馆（碧水寺项目采购方）· 绵州公证处（节点）</p></div>
+      <div class="fcard"><div class="fi">📮</div><h3 data-t="a3t">联系方式</h3><p data-t="a3d">邮箱：【待填】· 微信：【待填】· 地址：上海</p></div>
+      <div class="fcard"><div class="fi">⚖️</div><h3 data-t="a4t">合规声明</h3><p data-t="a4d">演示数据为示例；真实文物数据须取得馆方书面授权后使用；不涉及文物实物交易。</p></div>
+    </div>
+  </div>
+</section>
+
+<footer style="background:#0a1a33;color:#8fa3bf;padding:28px 32px;text-align:center;font-size:12.5px" data-t="foot">
+  文博链 RelicChain · 学生创业项目 · 全部页面离线可用 · 演示数据为示例 · © 2026
+</footer>
+
+<script>
+var I18N = {
+  zh: {
+    nav1:'平台能力', nav2:'精选文物', nav3:'数字体验', nav4:'动态', nav5:'关于', cta:'进入平台',
+    heroT:'让每件文物，可信、可查、可传承',
+    heroS:'文博链为文物数字化提供区块链可信底座：数字登记、全程溯源、授权管理、真伪验证——手机浏览器打开就是平台，双击就能演示。',
+    bt1:'🚀 立即体验平台', bt2:'▶ 观看原理演示',
+    s1k:'联盟共识节点', s2k:'平台功能', s3k:'分钟看懂区块链', s4k:'全国博物馆',
+    h1t:'平台能力', h1p:'四个核心模块，覆盖文物数字资产全生命周期',
+    f1t:'数字登记', f1d:'文物建立数字孪生，内容指纹与元数据写入链上，登记即确权。',
+    f2t:'全程溯源', f2d:'检测、修复、借展事件只增不改，任何历史时点可回溯。',
+    f3t:'授权管理', f3d:'数字资源授权对象、用途、期限全程留痕，可审计可撤销。',
+    f4t:'真伪验证', f4d:'本地计算哈希与链上比对，篡改 1 字节立刻现形，打印存证凭证。',
+    h2t:'精选文物', h2p:'碧水寺摩崖造像数字化档案（示例数据，取得授权后替换真实资料）',
+    r1t:'摩崖造像 · 主尊龛', r1m:'碧水寺-001 · 隋 · 砂岩', r1f:'指纹 0x9f3a…c21e',
+    r2t:'摩崖造像 · 说法图', r2m:'碧水寺-002 · 隋 · 砂岩', r2f:'指纹 0x7c2d…ab09',
+    r3t:'胁侍菩萨龛', r3m:'碧水寺-003 · 唐 · 砂岩', r3f:'指纹 0x31e8…77d4',
+    r4t:'碑刻 · 题记', r4m:'碧水寺-004 · 隋 · 石灰岩', r4f:'指纹 0x85b1…04aa',
+    lv1:'一级', lv2:'二级', rb1:'区块 #1', rb2:'区块 #2', rb3:'区块 #3', rb4:'区块 #4',
+    h3t:'数字体验', h3p:'四个入口，从原理到产品，全部离线可用',
+    d1t:'平台本体', d1d:'选身份登录，登记/溯源/授权/验证/审计，手机浏览器即 APP。',
+    d2t:'原理演示', d2d:'五步看懂：挖矿、篡改、验证、为什么改不回去。',
+    d3t:'存证演示', d3d:'下载档案 → 改一个字 → 上传验证，秒判真伪。',
+    d4t:'一图看懂', d4d:'交互式总览：核心逻辑、架构、数据模型、路线图。',
+    h4t:'项目动态',
+    n1t:'平台 v1.3 上线', n1d:'多账号登录、管理员机构/账号管理、审计日志、存证凭证打印与下载。',
+    n2t:'碧水寺摩崖造像数字化', n2d:'参与绵阳市博物馆采购项目扫描工作，四件文物数字档案已入驻平台。',
+    n3t:'联合试点推进中', n3d:'与上海建为历保洽谈"文物数字资产存证"联合小试点（免费、双品牌、不商用）。',
+    h5t:'关于我们', h5p:'大学生创业团队 · 数字媒体 / 计算机 / 网络工程 / 物联网',
+    a1t:'项目背景', a1d:'文物数字化成果分散、授权无据、真伪难辨——我们用区块链补上"信任"这块拼图。',
+    a2t:'合作机构', a2d:'上海建为历保（扫描项目合作）· 绵阳市博物馆（碧水寺项目采购方）· 绵州公证处（节点）',
+    a3t:'联系方式', a3d:'邮箱：【待填】· 微信：【待填】· 地址：上海',
+    a4t:'合规声明', a4d:'演示数据为示例；真实文物数据须取得馆方书面授权后使用；不涉及文物实物交易。',
+    foot:'文博链 RelicChain · 学生创业项目 · 全部页面离线可用 · 演示数据为示例 · © 2026'
+  },
+  en: {
+    nav1:'Capabilities', nav2:'Collection', nav3:'Experience', nav4:'News', nav5:'About', cta:'Launch Platform',
+    heroT:'Make Every Relic Trustworthy, Traceable, Inheritable',
+    heroS:'RelicChain builds a blockchain trust layer for cultural relic digitization: on-chain registration, full-lifecycle provenance, licensing and authenticity verification. Runs in any browser, works offline.',
+    bt1:'🚀 Try the Platform', bt2:'▶ Watch the Demo',
+    s1k:'Consortium Nodes', s2k:'Platform Modules', s3k:'Min To Understand', s4k:'Museums Nationwide',
+    h1t:'Platform Capabilities', h1p:'Four core modules covering the full lifecycle of relic digital assets',
+    f1t:'Registration', f1d:'Create a digital twin; write fingerprints and metadata on-chain — registration is confirmation.',
+    f2t:'Provenance', f2d:'Inspection, restoration and loan events are append-only — traceable at any point in time.',
+    f3t:'Licensing', f3d:'Authorization targets, usage and terms fully logged — auditable and revocable.',
+    f4t:'Verification', f4d:'Hash files locally and compare on-chain. One altered byte is exposed; print the certificate.',
+    h2t:'Featured Relics', h2p:'Bishui Temple cliff-carving digital archives (sample data; replaced after authorization)',
+    r1t:'Cliff Statue · Main Niche', r1m:'Bishui-001 · Sui · Sandstone', r1f:'FP 0x9f3a…c21e',
+    r2t:'Cliff Statue · Dharma Scene', r2m:'Bishui-002 · Sui · Sandstone', r2f:'FP 0x7c2d…ab09',
+    r3t:'Attendant Bodhisattva Niche', r3m:'Bishui-003 · Tang · Sandstone', r3f:'FP 0x31e8…77d4',
+    r4t:'Stone Tablet · Inscription', r4m:'Bishui-004 · Sui · Limestone', r4f:'FP 0x85b1…04aa',
+    lv1:'Grade I', lv2:'Grade II', rb1:'Block #1', rb2:'Block #2', rb3:'Block #3', rb4:'Block #4',
+    h3t:'Digital Experience', h3p:'Four entry points — from principle to product, all offline',
+    d1t:'Platform', d1d:'Role-based login; register, trace, license, verify, audit — the browser is the app.',
+    d2t:'Principle Demo', d2d:'Five steps: mining, tampering, verification, and why it cannot be undone.',
+    d3t:'Notarization Demo', d3d:'Download the archive, change one character, re-upload — verdict in seconds.',
+    d4t:'Overview Map', d4d:'Interactive overview: core logic, architecture, data model, roadmap.',
+    h4t:'News',
+    n1t:'Platform v1.3 Released', n1d:'Multi-account login, admin org/account management, audit log, certificate print & download.',
+    n2t:'Bishui Temple Digitization', n2d:'Participated in the Mianyang Museum procurement scanning; four relic archives now live on the platform.',
+    n3t:'Joint Pilot In Progress', n3d:'Discussing a joint relic digital asset notarization pilot with Shanghai Jianwei Libao.',
+    h5t:'About Us', h5p:'Student startup · Digital Media / CS / Network / IoT',
+    a1t:'Background', a1d:'Digitized relics are scattered, unlicensed and unverifiable — we add the missing piece: trust.',
+    a2t:'Partners', a2d:'Shanghai Jianwei Libao · Mianyang Museum · Mianzhou Notary Office',
+    a3t:'Contact', a3d:'Email: TBD · WeChat: TBD · Shanghai',
+    a4t:'Compliance', a4d:'Demo data only; real relic data requires written authorization; no physical trading.',
+    foot:'RelicChain · Student Startup · All pages offline · Sample data · © 2026'
+  }
+};
+var LANG = 'zh';
+function applyLang(){
+  document.querySelectorAll('[data-t]').forEach(function(el){
+    var k = el.getAttribute('data-t');
+    if (I18N[LANG][k]) el.textContent = I18N[LANG][k];
+  });
+  document.getElementById('langBtn').textContent = LANG === 'zh' ? 'EN' : '中文';
+  document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+}
+function toggleLang(){
+  LANG = LANG === 'zh' ? 'en' : 'zh';
+  try{ localStorage.setItem('rc-lang', LANG); }catch(e){}
+  applyLang();
+}
+try{ var saved = localStorage.getItem('rc-lang'); if (saved === 'en') LANG = 'en'; }catch(e){}
+applyLang();
+
+/* 滚动监听：导航高亮 + 回到顶部 */
+var SECS = ['features','relics','demo','news','about'];
+window.addEventListener('scroll', function(){
+  document.getElementById('toTop').classList.toggle('show', window.scrollY > 500);
+  var cur = '';
+  SECS.forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.getBoundingClientRect().top < 160) cur = id;
+  });
+  document.querySelectorAll('.nav-links a').forEach(function(a){
+    a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+  });
+});
+</script>
+<button class="totop" id="toTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+</body>
+</html>
+

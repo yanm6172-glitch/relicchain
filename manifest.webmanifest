@@ -1,0 +1,15 @@
+﻿{
+  "name": "文博链 RelicChain",
+  "short_name": "文博链",
+  "description": "文物数字资产区块链平台：登记、溯源、授权、扫码验证",
+  "start_url": "./区块链平台.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef2f7",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -1,0 +1,287 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文物数字资产存证演示 · RelicChain Demo</title>
+<style>
+:root{--blue:#1a5fb4;--green:#26a269;--orange:#e66100;--red:#c01c28;--ink:#1c2430;--muted:#5e6c84;--bg:#eef1f6;--card:#fff;--line:#d7dde6;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei","PingFang SC","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+header{background:linear-gradient(120deg,#123a6b,#1a5fb4 55%,#2b7fd4);color:#fff;padding:22px 32px 16px}
+header h1{font-size:23px;letter-spacing:1px}
+header .sub{margin-top:5px;opacity:.88;font-size:13.5px}
+.stats{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.28);border-radius:10px;padding:4px 13px;font-size:12.5px}
+.note{background:#fff8e6;border:1px solid #f0dca0;color:#7a5c00;border-radius:10px;padding:10px 14px;font-size:13px;margin:16px 32px 0}
+.wrap{display:grid;grid-template-columns:330px 1fr;gap:16px;padding:16px 32px 40px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(16,24,40,.06)}
+.card h2{font-size:17px;margin-bottom:8px}
+.list{padding:12px}
+.item{display:flex;gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;cursor:pointer;background:#fff;transition:.15s}
+.item:hover{border-color:var(--blue2,#2b7fd4)}
+.item.active{border-color:var(--blue);background:#e8f1fb}
+.icon{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none;color:#fff}
+.item .nm{font-weight:700;font-size:13.5px}
+.item .cd{font-size:11.5px;color:var(--muted)}
+.detail h2{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{background:#e6f6ee;color:var(--green);border:1px solid #a5d8bb;border-radius:20px;padding:2px 12px;font-size:12px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.kv{background:#f4f7fb;border:1px solid var(--line);border-radius:9px;padding:8px 12px}
+.kv .k{font-size:11px;color:var(--muted)}
+.kv .v{font-size:13.5px;font-weight:600;margin-top:2px}
+.chain{background:#f2fbf6;border:1px solid #bfe3cd;border-radius:12px;padding:14px 16px;margin:14px 0}
+.chain h3{color:var(--green);font-size:14px;margin-bottom:8px}
+.hrow{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;padding:5px 0;border-bottom:1px dashed #cfe7d9;flex-wrap:wrap}
+.hrow:last-child{border-bottom:none}
+.hrow .k{color:var(--muted);flex:none}
+.hash{font-family:Consolas,Menlo,monospace;font-size:11.5px;word-break:break-all;text-align:right;max-width:70%}
+.tl{margin-top:14px}
+.tl h3{font-size:14px;margin-bottom:8px;color:var(--ink)}
+.ev{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-left:2px solid var(--line);margin-left:6px;padding-left:14px;position:relative;font-size:13px}
+.ev::before{content:"";position:absolute;left:-5px;top:12px;width:8px;height:8px;border-radius:50%;background:var(--green)}
+.ev .t{color:var(--muted);font-size:12px;width:86px;flex:none}
+.verify{border:1.5px solid #b8c8dd;border-radius:12px;padding:14px 16px;margin-top:16px;background:#f8fafd}
+.verify h3{font-size:14px;margin-bottom:6px}
+.verify .tip{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.btn{background:#fff;border:1.5px solid var(--blue);color:var(--blue);border-radius:9px;padding:7px 14px;font-size:13px;cursor:pointer;font-weight:600}
+.btn:hover{background:#e8f1fb}
+.btn.gray{border-color:#8b9bb4;color:#5e6c84}
+.filebtn{display:inline-block;background:#1a5fb4;color:#fff;border-radius:9px;padding:7px 16px;font-size:13px;cursor:pointer;font-weight:600}
+.filebtn:hover{background:#2b7fd4}
+input[type=file]{display:none}
+.result{border-radius:10px;padding:12px 14px;margin-top:10px;font-size:13.5px;display:none}
+.result.ok{display:block;background:#f2fbf6;border:1px solid #bfe3cd;color:#166a43}
+.result.bad{display:block;background:#fdf3f4;border:1px solid #f0c8cb;color:#8f1d26}
+.result.warn{display:block;background:#fff8e6;border:1px solid #f0dca0;color:#7a5c00}
+footer{padding:0 32px 28px;color:var(--muted);font-size:12.5px}
+@media(max-width:900px){.wrap{grid-template-columns:1fr}}
+/* ===== 统一主题美化 ===== */
+body{background:linear-gradient(180deg,#e7edf8,#f4f7fb)}
+.card{border-radius:16px;border-color:#e2e8f0;box-shadow:0 2px 12px rgba(15,23,42,.06)}
+header{background:linear-gradient(120deg,#0b1f4b,#1d4ed8 55%,#3b82f6);box-shadow:0 8px 24px rgba(29,78,216,.22)}
+.btn:hover,.flow-controls button:hover{background:#eff6ff}
+.tab-btn.active{color:#1d4ed8;border-color:#1d4ed8}
+.search{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;margin-bottom:10px;background:#fff}
+.search:focus{outline:none;border-color:var(--blue2);box-shadow:0 0 0 3px rgba(59,130,246,.14)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>文物数字资产存证演示 · RelicChain Demo</h1>
+  <div class="sub">演示逻辑：文件哈希上链 → 任何人可本地验证"官方原版 / 被篡改 / 未登记"</div>
+  <div class="stats">
+    <span class="stat">已存证 10 件（示例数据）</span>
+    <span class="stat">哈希算法 SHA-256（浏览器本地计算）</span>
+    <span class="stat">链：开放联盟链（示例）</span>
+  </div>
+</header>
+
+<div class="note">⚠ <b>本页为演示数据</b>：文物名称与馆藏信息均为示例（机构名称参考碧水寺摩崖造像项目设置）。拿到馆方书面授权后，将示例替换为真实扫描照片与元数据即可对外路演。验证功能真实可用：下载"原版文件"再上传 → 判定官方原版；下载"被篡改示例"再上传 → 判定被篡改。</div>
+
+<div class="wrap">
+  <aside class="card list" id="listCard">
+    <h2>文物列表</h2>
+    <input id="searchBox" class="search" placeholder="🔍 搜索文物名称 / 馆藏编号" oninput="renderList()">
+    <div id="artifactList"></div>
+  </aside>
+
+  <main class="card detail" id="detailCard">
+    <div id="detailBody"></div>
+    <div class="verify" id="verifyBox">
+      <h3>文件验证（任何人可核）</h3>
+      <div class="tip">步骤：① 下载当前文物的"原版文件" ② 用记事本改一个字 ③ 上传修改后的文件 → 系统本地计算哈希并与链上登记指纹比对。</div>
+      <div class="btns">
+        <button class="btn" onclick="downloadFile('orig')">⬇ 下载原版文件</button>
+        <button class="btn gray" onclick="downloadFile('tamper')">⬇ 下载被篡改示例</button>
+        <label class="filebtn" for="verifyInput">⇪ 上传文件验证</label>
+        <input type="file" id="verifyInput">
+      </div>
+      <div class="result" id="verifyResult"></div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  配套：可视化总览.html（看懂逻辑）· docs/08-上海落地与融资作战计划.md · 工作代号：文博链 RelicChain
+</footer>
+<script>
+/* ============ 示例数据（拿到授权后替换为真实文物） ============ */
+var ARTIFACTS = [
+ {id:'a1',name:'青花缠枝莲纹盘',code:'碧水寺-001',dynasty:'明 · 永乐',material:'瓷器',level:'一级',icon:'🏺',color:'#1a5fb4',time:'2025-01-20 10:24:36',
+  desc:'示例说明：口径 32cm，胎质细腻，青花发色浓艳。此处替换为真实扫描照片与馆藏描述。',
+  events:[['2024-06-12','数字化采集','建为历保 · 扫描项目组'],['2025-01-20','数字登记','绵阳市博物馆（did:relic:bishui-01）'],['2025-01-22','质量审核','绵阳市博物馆 · 数字化小组']]},
+ {id:'a2',name:'饕餮纹青铜鼎',code:'碧水寺-002',dynasty:'商 · 晚期',material:'青铜',level:'一级',icon:'⏳',color:'#0e8a7a',time:'2025-01-20 11:02:14',
+  desc:'示例说明：三足圆鼎，腹饰饕餮纹。此处替换为真实扫描照片与馆藏描述。',
+  events:[['2024-06-14','数字化采集','建为历保 · 扫描项目组'],['2025-01-20','数字登记','绵阳市博物馆（did:relic:bishui-01）'],['2025-02-01','检测记录','文物检测中心（did:relic:exam-01）']]},
+ {id:'a3',name:'谷纹玉璧',code:'碧水寺-003',dynasty:'汉',material:'玉器',level:'二级',icon:'🪷',color:'#26a269',time:'2025-01-21 09:41:07',
+  desc:'示例说明：青玉质，双面谷纹。此处替换为真实扫描照片与馆藏描述。',
+  events:[['2024-06-15','数字化采集','建为历保 · 扫描项目组'],['2025-01-21','数字登记','绵阳市博物馆（did:relic:bishui-01）']]},
+ {id:'a4',name:'彩绘陶俑',code:'碧水寺-004',dynasty:'唐',material:'陶器',level:'三级',icon:'🧱',color:'#e66100',time:'2025-01-21 10:15:52',
+  desc:'示例说明：立姿仕女俑，彩绘大部保存。此处替换为真实扫描照片与馆藏描述。',
+  events:[['2024-06-18','数字化采集','建为历保 · 扫描项目组'],['2025-01-21','数字登记','绵阳市博物馆（did:relic:bishui-01）'],['2025-02-10','修复记录','文物修复室（did:relic:restore-01）']]},
+ {id:'a5',name:'山水图卷轴',code:'碧水寺-005',dynasty:'清',material:'纸本设色',level:'二级',icon:'🖼️',color:'#813d9c',time:'2025-01-22 08:56:21',
+  desc:'示例说明：绢本设色，引首、拖尾俱全。此处替换为真实扫描照片与馆藏描述。',
+  events:[['2024-06-20','数字化采集','建为历保 · 扫描项目组'],['2025-01-22','数字登记','绵阳市博物馆（did:relic:bishui-01）']]},
+ {id:'a6',name:'剔红漆盒',code:'碧水寺-006',dynasty:'元',material:'漆器',level:'一级',icon:'📦',color:'#c64600',time:'2025-01-22 09:30:44',
+  desc:'示例说明：圆形盒，盖面雕花卉纹。此处替换为真实扫描照片与馆藏描述。',
+  events:[['2024-06-22','数字化采集','建为历保 · 扫描项目组'],['2025-01-22','数字登记','绵阳市博物馆（did:relic:bishui-01）']]},
+ {id:'a7',name:'摩崖造像 · 主尊龛',code:'碧水寺-007',dynasty:'北魏',material:'铜鎏金',level:'一级',icon:'🗿',color:'#1a5fb4',time:'2025-01-23 10:05:13',
+  desc:'示例说明：摩崖造像三维扫描成果示例。此处替换为碧水寺真实扫描照片与馆藏描述。',
+  events:[['2024-06-25','数字化采集','建为历保 · 扫描项目组'],['2025-01-23','数字登记','绵阳市博物馆（did:relic:bishui-01）'],['2025-02-02','检测记录','文物检测中心（did:relic:exam-01）']]},
+ {id:'a8',name:'海兽葡萄纹铜镜',code:'碧水寺-008',dynasty:'唐',material:'青铜',level:'三级',icon:'🪞',color:'#26a269',time:'2025-01-23 11:12:40',
+  desc:'示例说明：圆形，瑞兽葡萄纹。此处替换为真实扫描照片与馆藏描述。',
+  events:[['2024-06-27','数字化采集','建为历保 · 扫描项目组'],['2025-01-23','数字登记','绵阳市博物馆（did:relic:bishui-01）']]},
+ {id:'a9',name:'摩崖造像 · 说法图',code:'碧水寺-009',dynasty:'战国',material:'竹',level:'一级',icon:'📜',color:'#0e8a7a',time:'2025-01-24 09:18:29',
+  desc:'示例说明：摩崖造像三维扫描成果示例。此处替换为碧水寺真实扫描照片与馆藏描述。',
+  events:[['2024-06-28','数字化采集','建为历保 · 扫描项目组'],['2025-01-24','数字登记','绵阳市博物馆（did:relic:bishui-01）']]},
+ {id:'a10',name:'织锦残片',code:'碧水寺-010',dynasty:'汉',material:'丝织品',level:'二级',icon:'🧵',color:'#813d9c',time:'2025-01-24 10:42:55',
+  desc:'示例说明：云气纹织锦。此处替换为真实扫描照片与馆藏描述。',
+  events:[['2024-06-30','数字化采集','建为历保 · 扫描项目组'],['2025-01-24','数字登记','绵阳市博物馆（did:relic:bishui-01）']]}
+];
+
+/* ============ 哈希工具（浏览器本地真实计算） ============ */
+function canonicalString(a){
+  return JSON.stringify({twinId:'urn:relic-chain:twin:'+a.id,relicId:a.code,name:a.name,dynasty:a.dynasty,material:a.material,level:a.level,orgDID:'did:relic:bishui-01'}, null, 2);
+}
+function buf2hex(buf){
+  return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
+}
+function sha256Hex(str){
+  if (!window.crypto || !window.crypto.subtle){
+    return Promise.resolve('unsupported');
+  }
+  var data = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', data).then(buf2hex);
+}
+
+var HASHES = {};      /* id -> sha256(hex) */
+var TXHASH = {};      /* id -> 交易哈希(演示) */
+var BLOCK = {};       /* id -> 区块高度(演示) */
+var current = 'a1';
+
+function init(){
+  var jobs = ARTIFACTS.map(function(a){
+    return sha256Hex(canonicalString(a)).then(function(h){
+      HASHES[a.id] = h;
+      return sha256Hex('tx:' + h);
+    }).then(function(tx){
+      TXHASH[a.id] = '0x' + tx.slice(0, 40);
+      BLOCK[a.id] = 1200 + (parseInt(HASHES[a.id].slice(0, 6), 16) % 8000);
+    });
+  });
+  Promise.all(jobs).then(function(){
+    if (HASHES.a1 === 'unsupported'){ alert('当前浏览器不支持本地哈希计算，请使用最新版 Chrome / Edge 打开。'); }
+    renderList();
+    selectArtifact('a1');
+  });
+}
+
+function renderList(){
+  var box = document.getElementById('artifactList');
+  box.innerHTML = '';
+  var kw = (document.getElementById('searchBox').value || '').trim().toLowerCase();
+  ARTIFACTS.forEach(function(a){
+    if (kw && (a.name + a.code).toLowerCase().indexOf(kw) < 0) return;
+    var d = document.createElement('div');
+    d.className = 'item';
+    d.setAttribute('data-id', a.id);
+    d.innerHTML = '<div class="icon" style="background:' + a.color + '">' + a.icon + '</div>' +
+      '<div><div class="nm">' + a.name + '</div><div class="cd">' + a.code + ' · ' + a.dynasty + '</div></div>';
+    d.addEventListener('click', function(){ selectArtifact(a.id); });
+    box.appendChild(d);
+  });
+}
+
+function selectArtifact(id){
+  current = id;
+  var a = null;
+  ARTIFACTS.forEach(function(x){ if (x.id === id) a = x; });
+  document.querySelectorAll('#artifactList .item').forEach(function(el){
+    el.classList.toggle('active', el.getAttribute('data-id') === id);
+  });
+  var eventsHtml = '';
+  a.events.forEach(function(e){
+    eventsHtml += '<div class="ev"><span class="t">' + e[0] + '</span><span>' + e[1] + '</span><span style="color:var(--muted)">— ' + e[2] + '</span></div>';
+  });
+  document.getElementById('detailBody').innerHTML =
+    '<h2><span class="icon" style="background:' + a.color + ';width:46px;height:46px">' + a.icon + '</span>' + a.name + '<span class="badge">✓ 已存证</span></h2>' +
+    '<div class="grid">' +
+    '<div class="kv"><div class="k">馆藏编号</div><div class="v">' + a.code + '</div></div>' +
+    '<div class="kv"><div class="k">年代</div><div class="v">' + a.dynasty + '</div></div>' +
+    '<div class="kv"><div class="k">材质</div><div class="v">' + a.material + '</div></div>' +
+    '<div class="kv"><div class="k">文物等级</div><div class="v">' + a.level + '</div></div>' +
+    '<div class="kv"><div class="k">登记机构</div><div class="v">绵阳市博物馆</div></div>' +
+    '</div>' +
+    '<div style="font-size:13px;color:var(--muted);margin-bottom:4px">' + a.desc + '</div>' +
+    '<div class="chain"><h3>▍链上存证记录（合约 TwinRegistry）</h3>' +
+    '<div class="hrow"><span class="k">存证哈希 SHA-256</span><span class="hash">0x' + HASHES[id] + '</span></div>' +
+    '<div class="hrow"><span class="k">交易哈希（示例）</span><span class="hash">' + TXHASH[id] + '</span></div>' +
+    '<div class="hrow"><span class="k">区块高度（示例）</span><span class="hash">#' + BLOCK[id] + '</span></div>' +
+    '<div class="hrow"><span class="k">存证时间</span><span class="hash">' + a.time + '</span></div>' +
+    '<div class="hrow"><span class="k">状态</span><span class="hash" style="color:#166a43;font-weight:700">REGISTERED 已登记</span></div>' +
+    '</div>' +
+    '<div class="tl"><h3>▍溯源时间线（ProvenanceLog）</h3>' + eventsHtml + '</div>';
+  hideResult();
+}
+
+function downloadFile(kind){
+  var a = null;
+  ARTIFACTS.forEach(function(x){ if (x.id === current) a = x; });
+  var content = canonicalString(a);
+  if (kind === 'tamper') content = content + '\n【此处被篡改】';
+  var blob = new Blob([content], {type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var link = document.createElement('a');
+  link.href = url;
+  link.download = (kind === 'tamper' ? a.id + '-篡改示例.json' : a.id + '-原版.json');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function hideResult(){
+  var r = document.getElementById('verifyResult');
+  r.className = 'result';
+  r.innerHTML = '';
+}
+
+function showResult(cls, html){
+  var r = document.getElementById('verifyResult');
+  r.className = 'result ' + cls;
+  r.innerHTML = html;
+}
+
+document.getElementById('verifyInput').addEventListener('change', function(ev){
+  var f = ev.target.files[0];
+  if (!f) return;
+  f.text().then(function(text){
+    sha256Hex(text.replace(/\r\n/g, '\n')).then(function(fileHash){
+      var line1 = '<div>文件哈希：0x' + fileHash + '</div>';
+      var line2 = '<div style="word-break:break-all">链上哈希：0x' + HASHES[current] + '</div>';
+      if (fileHash === HASHES[current]){
+        showResult('ok', '<b>✅ 官方原版</b>：文件与链上登记指纹完全一致，来源可信、未被篡改。' + line1 + line2);
+      } else {
+        var other = null;
+        ARTIFACTS.forEach(function(x){ if (HASHES[x.id] === fileHash) other = x; });
+        if (other){
+          showResult('warn', '<b>⚠ 文件已登记，但属于另一件文物</b>：「' + other.name + '」（' + other.code + '）。请确认文件与文物的对应关系。' + line1 + line2);
+        } else {
+          showResult('bad', '<b>❌ 不一致</b>：文件与链上登记指纹不符——被篡改或从未登记。任何 1 字节改动都会导致此结果。' + line1 + line2);
+        }
+      }
+      ev.target.value = '';
+    });
+  });
+});
+
+init();
+</script>
+</body>
+</html>
+
+
+

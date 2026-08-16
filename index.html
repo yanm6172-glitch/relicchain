@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文博链 RelicChain · 产品启动台</title>
+<style>
+:root{--p1:#1d4ed8;--p2:#3b82f6;--gold:#d4a943;--ink:#12203a;--muted:#64748b;--line:#e2e8f0;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"PingFang SC","Microsoft YaHei","Segoe UI",system-ui,sans-serif;background:linear-gradient(160deg,#0a1a33,#123a6b 50%,#1d4ed8);min-height:100vh;color:#fff;padding:40px 20px}
+.wrap{max-width:960px;margin:0 auto;text-align:center}
+.logo{width:76px;height:76px;margin:0 auto 14px;border-radius:22px;background:linear-gradient(135deg,#1d4ed8,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:34px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+h1{font-size:30px;letter-spacing:3px}
+.sub{opacity:.85;font-size:14px;margin-top:8px}
+.badge{display:inline-block;background:rgba(212,169,67,.15);border:1px solid rgba(212,169,67,.5);color:#f3d27a;border-radius:20px;padding:4px 16px;font-size:12.5px;font-weight:700;margin-top:14px}
+.steps{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 34px}
+.step{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:8px 16px;font-size:12.5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-bottom:34px}
+.card{background:#fff;color:var(--ink);border-radius:18px;padding:20px 16px;text-align:left;text-decoration:none;transition:all .18s;position:relative;overflow:hidden}
+.card:hover{transform:translateY(-5px);box-shadow:0 14px 34px rgba(0,0,0,.35)}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px}
+.card.c1::before{background:linear-gradient(90deg,#1d4ed8,#60a5fa)}
+.card.c2::before{background:linear-gradient(90deg,#059669,#34d399)}
+.card.c3::before{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.card.c4::before{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.card.c5::before{background:linear-gradient(90deg,#dc2626,#f87171)}
+.card.c6::before{background:linear-gradient(90deg,#0e8a7a,#2dd4bf)}
+.card .ic{font-size:26px;margin-bottom:8px}
+.card h3{font-size:16px;margin-bottom:4px}
+.card p{font-size:12px;color:var(--muted);line-height:1.6}
+.docs{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:18px;text-align:left;font-size:13px;line-height:2}
+.docs b{color:#f3d27a}
+.docs a{color:#bfdbfe;text-decoration:none;margin:0 6px}
+.foot{margin-top:28px;font-size:12px;opacity:.7}
+@media(max-width:480px){h1{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">⛓️</div>
+  <h1>文博链 RelicChain</h1>
+  <div class="sub">文物数字资产区块链平台 · 让每件文物可信、可查、可传承</div>
+  <div class="badge">标准商品版 v1.8 · 零安装 · 离线可用</div>
+
+  <div class="steps">
+    <div class="step">① 双击任一卡片即可打开</div>
+    <div class="step">② 演示账号 museum / 123456</div>
+    <div class="step">③ 手机浏览器打开 = APP</div>
+  </div>
+
+  <div class="grid">
+    <a class="card c1" href="区块链平台.html"><div class="ic">📱</div><h3>平台本体</h3><p>登记 / 溯源 / 授权 / 验证 / 扫一扫 / 审计，多角色登录，手机即 APP。</p></a>
+    <a class="card c2" href="区块链演示.html"><div class="ic">🧩</div><h3>原理演示</h3><p>五步看懂区块链：挖矿、篡改、验证、为什么改不回去。</p></a>
+    <a class="card c3" href="存证演示demo.html"><div class="ic">🔐</div><h3>存证演示</h3><p>下载档案 → 改一个字 → 上传验证，秒判真伪。</p></a>
+    <a class="card c4" href="可视化总览.html"><div class="ic">🗺️</div><h3>一图看懂</h3><p>核心逻辑、架构、数据模型、路线图，交互式总览。</p></a>
+    <a class="card c5" href="大屏.html"><div class="ic">🖥️</div><h3>数据大屏</h3><p>链全景 + 指标 + 审计流，演示模式自动轮播，双击全屏。</p></a>
+    <a class="card c6" href="官网.html"><div class="ic">🌐</div><h3>官方网站</h3><p>产品对外形象，中英双语切换，移动端适配。</p></a>
+  </div>
+
+  <div class="docs">
+    <b>📚 文档速查：</b>
+    <a href="使用说明.md">使用说明</a>｜
+    <a href="安装说明.md">安装说明</a>｜
+    <a href="平台使用手册.md">平台手册</a>｜
+    <a href="BP-一页纸商业计划书.md">BP</a>｜
+    <a href="路演视频脚本.md">路演脚本</a>｜
+    <a href="更新记录.md">更新记录</a><br>
+    <b>📁 完整文档库：</b><a href="docs/">docs/ 01–27</a>（设计、打法、商品化、成交作战包）<br>
+    <b>⚙️ 真实模式（推荐）</b>：安装 Node.js 后双击 <a href="启动服务器.bat">启动服务器.bat</a> ——多设备共享数据的真软件（手机同 WiFi 访问 http://电脑IP:8080）<br>
+    <b>⚙️ 离线模式</b>：双击 <a href="启动APP.bat">启动APP.bat</a>（静态服务）或直接双击各页面；APK 打包见 docs/18
+  </div>
+
+  <div class="foot">文博链 RelicChain · 学生创业项目 · 全部页面离线可用 · 演示数据为示例 · © 2026</div>
+</div>
+</body>
+</html>
+

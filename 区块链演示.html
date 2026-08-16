@@ -1,0 +1,315 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>区块链演示 · RelicChain（双击就能玩）</title>
+<style>
+:root{--blue:#1a5fb4;--blue2:#2b7fd4;--green:#26a269;--orange:#e66100;--red:#c01c28;--ink:#1c2430;--muted:#5e6c84;--bg:#eef1f6;--card:#fff;--line:#d7dde6;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Microsoft YaHei","PingFang SC","Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+header{background:linear-gradient(120deg,#123a6b,#1a5fb4 55%,#2b7fd4);color:#fff;padding:22px 32px 16px}
+header h1{font-size:23px;letter-spacing:1px}
+header .sub{margin-top:5px;opacity:.9;font-size:13.5px}
+.guide{background:#fff8e6;border:1px solid #f0dca0;color:#7a5c00;border-radius:10px;padding:10px 14px;font-size:13px;margin:16px 32px 0}
+.guide b{color:#5c4400}
+.wrap{padding:16px 32px 40px;max-width:1150px;margin:0 auto}
+.inds{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.ind{flex:1;min-width:120px;text-align:center;border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;font-size:13px;color:var(--muted);background:#fff}
+.ind.active{border-color:var(--blue);color:var(--blue);font-weight:700;background:#e8f1fb}
+.panel{display:none}
+.panel.active{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(16,24,40,.06)}
+.panel h2{font-size:18px;margin-bottom:8px}
+.panel p{font-size:14px;color:#333;margin-bottom:10px}
+.mini-guide{background:#eef4fb;border-left:4px solid var(--blue);border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:14px}
+.formrow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.formrow select,.formrow input{border:1.5px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px;background:#fff}
+.formrow input{flex:1;min-width:220px}
+.btn{background:#fff;border:1.5px solid var(--blue);color:var(--blue);border-radius:10px;padding:9px 18px;font-size:14px;cursor:pointer;font-weight:600}
+.btn:hover{background:#e8f1fb}
+.btn.big{font-size:16px;padding:12px 26px;background:var(--blue);color:#fff}
+.btn.big:hover{background:var(--blue2)}
+.btn.gray{border-color:#8b9bb4;color:#5e6c84}
+.hidden{display:none}
+.status{padding:12px 16px;border-radius:12px;margin:0 0 14px;font-weight:600;font-size:14px}
+.status.ok{background:#f2fbf6;border:1px solid #bfe3cd;color:#166a43}
+.status.bad{background:#fdf3f4;border:1px solid #f0c8cb;color:#8f1d26}
+.status.busy{background:#fff8e6;border:1px solid #f0dca0;color:#7a5c00}
+.chain-wrap{overflow-x:auto;padding-bottom:6px}
+.chain{display:flex;gap:12px;min-width:max-content;padding:6px 4px 14px}
+.blk{min-width:235px;max-width:235px;border:2px solid var(--line);border-radius:12px;padding:12px;background:#fff;position:relative;flex:none}
+.blk.ok{border-color:var(--green)}
+.blk.bad{border-color:var(--red);background:#fdf3f4}
+.blk.tampered{border-color:var(--orange)}
+.blk.new{border-color:var(--blue);background:#e8f1fb}
+.blk .no{font-weight:800;font-size:15px}
+.blk .flag{position:absolute;top:8px;right:10px;font-size:12px}
+.blk .type{display:inline-block;background:#eef1f6;border:1px solid var(--line);border-radius:12px;padding:1px 9px;font-size:11px;margin:6px 0}
+.blk .content{font-size:13px;font-weight:600;margin-bottom:6px}
+.blk .org{font-size:11.5px;color:var(--muted);margin-bottom:8px}
+.blk .hr{font-size:11px;color:var(--muted)}
+.hash{font-family:Consolas,Menlo,monospace;font-size:10.5px;word-break:break-all;background:#f4f7fb;border:1px solid var(--line);border-radius:6px;padding:3px 6px;margin:4px 0}
+.walk{font-size:13.5px;margin:6px 0 12px}
+.wl{padding:3px 0}
+.wl.ok{color:var(--green)}
+.wl.bad{color:var(--red)}
+.final{background:linear-gradient(120deg,#e6f6ee,#f2fbf6);border:1.5px solid #26a269;border-radius:12px;padding:14px 18px;margin-top:12px;font-size:14.5px;color:#166a43;font-weight:600}
+.bottombar{display:flex;gap:12px;align-items:center;margin-top:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+footer{padding:0 32px 28px;color:var(--muted);font-size:12.5px}
+@media(max-width:800px){.wrap{padding:12px 14px 30px}header{padding:18px 14px 14px}.guide{margin:12px 14px 0}}
+/* ===== 统一主题美化 ===== */
+body{background:linear-gradient(180deg,#e7edf8,#f4f7fb)}
+.card{border-radius:16px;border-color:#e2e8f0;box-shadow:0 2px 12px rgba(15,23,42,.06)}
+header{background:linear-gradient(120deg,#0b1f4b,#1d4ed8 55%,#3b82f6);box-shadow:0 8px 24px rgba(29,78,216,.22)}
+.btn:hover,.flow-controls button:hover{background:#eff6ff}
+.tab-btn.active{color:#1d4ed8;border-color:#1d4ed8}
+.ind{transition:all .2s}
+.ind.active{border-color:var(--blue);color:var(--blue);font-weight:700;background:#e8f1fb;box-shadow:0 4px 12px rgba(29,78,216,.12)}
+.ind.done{border-color:#26a269;color:#26a269;background:#eefaf3}
+.ind.done::after{content:" ✓"}
+.btn:disabled,.btn.big:disabled{opacity:.5;cursor:not-allowed;transform:none !important}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>区块链演示 · RelicChain（双击就能玩）</h1>
+  <div class="sub">不装软件、不用联网——跟着 ①②③④⑤ 各点一次按钮，10 分钟看懂区块链为什么"改不了"</div>
+</header>
+
+<div class="guide"><b>操作只有三件事：</b>① 双击打开本文件；② 从上到下，把每个步骤的按钮点一遍；③ 看颜色变化和提示文字，就懂了。玩坏了点右下角「↺ 重置演示」。</div>
+
+<div class="wrap">
+  <div class="inds">
+    <div class="ind active" id="ind1">① 看链长什么样</div>
+    <div class="ind" id="ind2">② 添加一笔登记</div>
+    <div class="ind" id="ind3">③ 篡改数据</div>
+    <div class="ind" id="ind4">④ 验证整条链</div>
+    <div class="ind" id="ind5">⑤ 为什么修不回去</div>
+  </div>
+  <div class="panel active" id="p1">
+    <h2>① 看看一条链长什么样</h2>
+    <p>下面三个区块已经连成一条链。每个区块都记着<b>前一个区块的哈希</b>——像锁链一样一环扣一环。</p>
+    <div class="mini-guide">找规律：区块 #2 的「前块哈希」= 区块 #1 的「本块哈希」。这就是"链"。</div>
+    <button class="btn big" onclick="gotoStep(2)">我看懂了，下一步 →</button>
+  </div>
+
+  <div class="panel" id="p2">
+    <h2>② 添加一笔登记（体验挖矿）</h2>
+    <p>登记一件文物。注意看：新块<b>不是随便加的</b>——计算机要不停尝试 nonce（随机数），直到算出的哈希以 N 个 0 开头。这叫<b>工作量证明（挖矿）</b>。</p>
+    <div class="formrow">
+      <select id="selType"><option>数字登记</option><option>溯源事件</option><option>修复记录</option></select>
+      <input id="inpContent" value="摩崖造像 · 说法图（碧水寺-009）">
+      <button class="btn" id="act2" onclick="addNewBlock()">➕ 打包上链</button>
+    </div>
+    <div class="hidden" id="next2"><button class="btn big" onclick="gotoStep(3)">下一步 →</button></div>
+  </div>
+
+  <div class="panel" id="p3">
+    <h2>③ 试着篡改数据</h2>
+    <p>现在当一回"坏人"：把区块 #2 里的登记内容偷偷改掉。看整条链会变成什么样。</p>
+    <button class="btn" id="act3" onclick="tamper()">⚠ 篡改区块 #2 的数据</button>
+    <div class="hidden" id="next3"><button class="btn big" onclick="gotoStep(4)">下一步 →</button></div>
+  </div>
+
+  <div class="panel" id="p4">
+    <h2>④ 验证整条链</h2>
+    <p>任何人（比如公众）都可以把每个区块重新算一遍，检查两件事：① 哈希是不是真的以 N 个 0 开头；② 「前块哈希」是否对得上。</p>
+    <button class="btn" id="act4" onclick="validateDemo()">🔍 验证整条链</button>
+    <div class="walk" id="walk"></div>
+    <div class="hidden" id="next4"><button class="btn big" onclick="gotoStep(5)">下一步 →</button></div>
+  </div>
+
+  <div class="panel" id="p5">
+    <h2>⑤ 为什么修不回去？</h2>
+    <p>坏人不死心：把篡改过的区块<b>重新挖矿</b>，让它自己的哈希"合法"。试试会发生什么。</p>
+    <button class="btn" id="act5" onclick="repair()">🔧 重新挖矿"修复"区块 #2</button>
+    <div class="final hidden" id="final">🎉 你已看懂区块链的核心：哈希链接 + 工作量证明 = 不可篡改。真实世界里还有 4–7 个机构节点各存一份，多数不同意就永远改不成。</div>
+  </div>
+
+  <div class="status ok" id="status">⏳ 正在初始化演示链（本地计算哈希，稍等 1–2 秒）…</div>
+  <div class="chain-wrap"><div class="chain" id="chain"></div></div>
+
+  <div class="bottombar">
+    <button class="btn gray" onclick="location.reload()">↺ 重置演示</button>
+    <span>挖矿难度（哈希开头 0 的个数）：</span>
+    <select id="diffSel" onchange="setDiff(this.value)"><option value="1">1（快）</option><option value="2" selected>2（默认）</option><option value="3">3（慢）</option></select>
+    <span style="color:var(--muted)">演示数据为示例 · 关闭页面即重置 · 本页不上传任何数据</span>
+  </div>
+</div>
+
+<footer>
+  配套：可视化总览.html（看整体逻辑）· 存证演示demo.html（看应用效果）· 使用说明.md（全部文件怎么用）· 工作代号：文博链 RelicChain
+</footer>
+<script>
+/* ============ 工具函数 ============ */
+var DIFF = 2;
+var blocks = [];
+var busy = false;
+
+function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function buf2hex(buf){ return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ('0'+b.toString(16)).slice(-2); }).join(''); }
+function sha256Hex(str){
+  if (!window.crypto || !window.crypto.subtle){ return Promise.resolve(null); }
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)).then(buf2hex);
+}
+function blockStr(b){ return b.index + '|' + b.prevHash + '|' + b.time + '|' + JSON.stringify(b.data) + '|' + b.nonce; }
+function targetOf(d){ var s=''; for(var i=0;i<d;i++){ s+='0'; } return s; }
+function short(h){ if(!h) return ''; return h.slice(0,12) + '…' + h.slice(-8); }
+function fmtTime(t){ return new Date(t).toLocaleTimeString('zh-CN', {hour12:false}); }
+
+function setStatus(cls, text){
+  var el = document.getElementById('status');
+  el.className = 'status ' + cls;
+  el.textContent = text;
+}
+function setDiff(v){ DIFF = parseInt(v, 10); }
+
+/* ============ 挖矿 ============ */
+async function mineBlock(b){
+  var target = targetOf(b.diff);
+  b.nonce = 0;
+  setStatus('busy', '⛏ 正在打包区块 #' + b.index + '：不停尝试 nonce，直到哈希以 ' + b.diff + ' 个 0 开头（当前尝试：0）…');
+  var statusEl = document.getElementById('status');
+  while(true){
+    b.nonce++;
+    if (b.nonce % 150 === 0){
+      statusEl.textContent = '⛏ 正在打包区块 #' + b.index + '：不停尝试 nonce，直到哈希以 ' + b.diff + ' 个 0 开头（当前尝试：' + b.nonce + '）…';
+      await sleep(0);
+    }
+    var h = await sha256Hex(blockStr(b));
+    if (h === null){ setStatus('bad', '❌ 浏览器不支持本地哈希计算，请用最新版 Chrome / Edge 打开本文件。'); return false; }
+    if (h.slice(0, b.diff) === target){ b.hash = h; return true; }
+  }
+}
+
+/* ============ 建链 ============ */
+async function initChain(){
+  var t0 = Date.now();
+  blocks = [
+    { index:0, prevHash:'0'.repeat(64), time:t0, diff:1, nonce:0, hash:'', data:{type:'系统', content:'创世区块 · RelicChain 演示链启动（碧水寺摩崖造像数字档案）', org:'—'} },
+    { index:1, prevHash:'', time:t0+30000, diff:DIFF, nonce:0, hash:'', data:{type:'数字登记', content:'摩崖造像 · 主尊龛（碧水寺-007）', org:'绵阳市博物馆'} },
+    { index:2, prevHash:'', time:t0+60000, diff:DIFF, nonce:0, hash:'', data:{type:'溯源事件', content:'材质检测记录入库', org:'文物检测中心'} }
+  ];
+  for (var i = 0; i < blocks.length; i++){
+    blocks[i].prevHash = (i === 0) ? '0'.repeat(64) : blocks[i-1].hash;
+    var ok = await mineBlock(blocks[i]);
+    if (!ok) return;
+  }
+  renderChain();
+  await validateChain(true);
+}
+
+/* ============ 渲染 ============ */
+function renderChain(){
+  var box = document.getElementById('chain');
+  box.innerHTML = '';
+  blocks.forEach(function(b){
+    var cls = 'blk';
+    if (b.bad) cls += ' bad';
+    else if (b.tampered) cls += ' tampered';
+    else if (b.isNew) cls += ' new';
+    else cls += ' ok';
+    var flag = b.bad ? '❌' : (b.tampered ? '⚠️' : '✅');
+    var d = document.createElement('div');
+    d.className = cls;
+    d.innerHTML =
+      '<div class="no">区块 #' + b.index + '<span class="flag">' + flag + '</span></div>' +
+      '<div class="type">' + b.data.type + '</div>' +
+      '<div class="content">' + b.data.content + '</div>' +
+      '<div class="org">登记方：' + b.data.org + ' · ' + fmtTime(b.time) + '</div>' +
+      '<div class="hr">前块哈希</div><div class="hash">' + short(b.prevHash) + '</div>' +
+      '<div class="hr">本块哈希</div><div class="hash" title="' + (b.hash || '') + '">' + short(b.hash) + '</div>' +
+      '<div class="hr">nonce（尝试次数）</div><div class="hash">' + b.nonce + ' · 难度 ' + b.diff + '</div>';
+    box.appendChild(d);
+    b.isNew = false;
+  });
+}
+
+/* ============ 验证 ============ */
+async function validateChain(quiet){
+  var walk = [];
+  var okAll = true;
+  for (var i = 0; i < blocks.length; i++){
+    var b = blocks[i];
+    var h = await sha256Hex(blockStr(b));
+    var okHash = (h !== null && h === b.hash);
+    var okLink = (i === 0) ? true : (b.prevHash === blocks[i-1].hash);
+    var ok = okHash && okLink;
+    b.bad = !ok;
+    if (!ok) okAll = false;
+    walk.push('<div class="wl ' + (ok ? 'ok' : 'bad') + '">区块 #' + i + '：哈希校验 ' + (okHash ? '✔' : '✘ 不通过') + ' · 前块链接 ' + (okLink ? '✔' : '✘ 断链') + '</div>');
+  }
+  renderChain();
+  var w = document.getElementById('walk');
+  if (w) w.innerHTML = walk.join('');
+  if (!quiet){
+    if (okAll) setStatus('ok', '✅ 整条链有效：每个区块的哈希都对、每一环都扣得上。');
+    else setStatus('bad', '❌ 链已损坏：发现被改动或断链的区块（标红）。区块链就是这样"自己发现自己被改过"。');
+  }
+  return okAll;
+}
+function validateDemo(){ validateChain(false).then(function(){ document.getElementById('next4').classList.remove('hidden'); document.getElementById('act4').disabled = true; }); }
+
+/* ============ 添加区块 ============ */
+async function addNewBlock(){
+  if (busy) return;
+  busy = true;
+  var content = document.getElementById('inpContent').value || '示例登记';
+  var type = document.getElementById('selType').value;
+  var b = { index: blocks.length, prevHash: blocks[blocks.length-1].hash, time: Date.now(), diff: DIFF, nonce:0, hash:'', isNew:true,
+            data:{ type: type, content: content, org:'绵阳市博物馆' } };
+  blocks.push(b);
+  renderChain();
+  var ok = await mineBlock(b);
+  if (!ok){ busy = false; return; }
+  await validateChain(true);
+  setStatus('ok', '✅ 新区块 #' + b.index + ' 已上链：试了 ' + b.nonce + ' 次 nonce 才找到合法哈希（以 ' + b.diff + ' 个 0 开头）。');
+  document.getElementById('next2').classList.remove('hidden');
+  document.getElementById('act2').disabled = true;
+  busy = false;
+}
+
+/* ============ 篡改 ============ */
+async function tamper(){
+  var b = blocks[2];
+  b.tampered = true;
+  b.data.content = b.data.content + ' ⚠【数据已被篡改】';
+  b.hash = await sha256Hex(blockStr(b));   /* 直接重算，不重新挖矿 → 哈希不再以 0 开头 */
+  await validateChain(true);
+  setStatus('bad', '❌ 链已损坏：区块 #2 的数据被改了——它自己的哈希对不上难度要求，后面所有区块也全部断链。红色的都是"叛徒"。');
+  document.getElementById('next3').classList.remove('hidden');
+  document.getElementById('act3').disabled = true;
+}
+
+/* ============ 修复（演示为什么修不回去） ============ */
+async function repair(){
+  var b = blocks[2];
+  setStatus('busy', '🔧 坏人正在重新挖矿"修复"区块 #2 …');
+  await mineBlock(b);   /* 重新挖矿 → 本块哈希"合法"了 */
+  var okAll = await validateChain(true);
+  if (okAll){
+    setStatus('ok', '✅ （异常情况：整条链竟然恢复了——正常演示不会出现，请点重置重玩。）');
+  } else {
+    setStatus('bad', '🔧 区块 #2 自己"合法"了——但它的哈希变了，区块 #3 的「前块哈希」对不上，整条链依然无效。想改成功？必须把后面所有区块全部重挖一遍，而联盟链上 4–7 个机构节点各存一份，多数不认你。这就是"不可篡改"。');
+  }
+  document.getElementById('final').classList.remove('hidden');
+  document.getElementById('act5').disabled = true;
+}
+
+/* ============ 步骤引导 ============ */
+function gotoStep(n){
+  for (var i = 1; i <= 5; i++){
+    document.getElementById('p' + i).classList.toggle('active', i === n);
+    document.getElementById('ind' + i).classList.toggle('active', i === n);
+    document.getElementById('ind' + i).classList.toggle('done', i < n);
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+initChain().then(function(){ gotoStep(1); });
+</script>
+</body>
+</html>
+
+
