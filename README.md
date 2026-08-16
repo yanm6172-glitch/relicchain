@@ -1,9 +1,19 @@
-﻿# 数字化区块链 · 传统文物数字化平台
+﻿# 文博链 RelicChain · 文物数字资产区块链平台
 
-> 工作代号：**文博链（RelicChain）**
-> 当前阶段：**构思与设计**（本目录为设计文档库，尚未进入开发）
->
-> **当前方向（2026）：两条腿走路**——① AI 商家内容服务（docs/13，现金流主力，客户走上门就能谈）② 文保数字化采集与建模（docs/11–12，行业纵深案例）；区块链方案存档（docs/01–06、10）。
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/Node-18%2B-brightgreen.svg)](https://nodejs.org)
+![Version](https://img.shields.io/badge/Version-v2.3-blue)
+
+> 让每件文物，可信、可查、可传承。标准商品版 v2.3：登记 / 溯源 / 授权 / 扫码验证，含官网、数据大屏、真实服务端（Node.js 零依赖）与全套文档。
+
+## 快速开始（3 步 · 真实模式）
+
+1. 安装 Node.js（LTS）：https://nodejs.org ；
+2. 双击 `启动服务器.bat`（自动打开 http://localhost:8080/index.html）；
+3. 手机连同一 WiFi，访问启动窗口里显示的 `http://电脑IP:8080` —— 多设备共享同一条链。
+
+> 演示账号：museum/123456 · exam/123456 · admin/admin888 · 公众免登录。
+> 离线模式：直接双击 index.html（数据仅存本机浏览器）。
 
 ## 一句话定位
 
@@ -164,4 +174,5 @@
 - 许可证：MIT（见 LICENSE），欢迎 fork 与提交改进；
 - 仓库结构：55 个文件全部入库；运行数据 data.json 已加入 .gitignore（首次启动自动生成）；
 - 上传 GitHub：见 [docs/29-GitHub上传指南.md](docs/29-GitHub上传指南.md)，或双击 上传GitHub.bat 粘贴仓库地址。
+
 
