@@ -158,3 +158,9 @@
 
 
 
+
+## 开源与协作
+
+- 许可证：MIT（见 LICENSE），欢迎 fork 与提交改进；
+- 仓库结构：55 个文件全部入库；运行数据 data.json 已加入 .gitignore（首次启动自动生成）；
+- 上传 GitHub：见 [docs/29-GitHub上传指南.md](docs/29-GitHub上传指南.md)，或双击 上传GitHub.bat 粘贴仓库地址。
